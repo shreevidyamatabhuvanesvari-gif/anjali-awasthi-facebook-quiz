@@ -31,8 +31,10 @@ h1{font-size:clamp(29px,8vw,42px);line-height:1.06;margin:0;font-weight:950;lett
 .editor{background:#f5f7fb;padding:14px;overflow:auto}.editor-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.editor-head h2{font-size:19px;margin:0}
 .editor-card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:13px;margin-bottom:10px;box-shadow:0 5px 18px rgba(20,35,60,.05)}.editor-card h3{margin:0 0 9px;font-size:13px;color:#1877f2}
 .field{margin:8px 0}.field label{display:block;font-size:10px;font-weight:850;color:#667085;margin-bottom:4px}.field input,.field textarea,.field select{width:100%;border:1px solid #d8dee8;border-radius:11px;padding:9px 10px;outline:none;background:#fbfcfe;color:#111827}.field textarea{min-height:58px;resize:vertical}
+.lang-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}.lang-row .field{margin:0}
 .opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.editor-actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(245,247,251,0),#f5f7fb 22%);padding:14px 0 4px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .photo-field{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.photo-preview{width:86px;height:64px;object-fit:contain;border-radius:10px;border:1px solid #d8dee8;display:none}.photo-preview.show{display:block}.photo-help{font-size:9px;color:#667085;margin-top:4px}
+.lang-help{font-size:9px;color:#667085;margin-top:4px;line-height:1.35}
 
 /* QUIZ */
 .quiz{background:linear-gradient(150deg,#08162d,#0b3f91 52%,#1877f2);color:#fff;padding:13px 14px 18px}.quiz:before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;background:#ff4f9a;opacity:.22;filter:blur(45px);top:-100px;right:-100px}
@@ -69,7 +71,7 @@ h1{font-size:clamp(29px,8vw,42px);line-height:1.06;margin:0;font-weight:950;lett
   <div class="hero">
     <div class="fbmark">f</div>
     <h1>Anjali Awasthi<br>Facebook Quiz</h1>
-    <p>पहले प्रश्न और सभी विकल्प आवाज़ में सुनें, फिर बीच स्क्रीन पर 5 सेकंड का countdown देखें और सही उत्तर की व्याख्या सुनें।</p>
+    <p>पहले प्रश्न और सभी विकल्प आवाज़ में सुनें, फिर बीच स्क्रीन पर 5 सेकंड का countdown देखें और सही उत्तर व पूरी व्याख्या सुनें।</p>
     <div class="meta">
       <div><b id="startTotal">10</b><span>QUESTIONS</span></div>
       <div><b>5s</b><span>TIMER</span></div>
@@ -79,7 +81,7 @@ h1{font-size:clamp(29px,8vw,42px);line-height:1.06;margin:0;font-weight:950;lett
       <button id="editBtn" class="btn outline">✏️ प्रश्न / उत्तर चुनें</button>
       <button id="startBtn" class="btn primary">▶ QUIZ शुरू करें</button>
     </div>
-    <div class="small-note">आप प्रश्न, A/B/C/D, सही उत्तर और व्याख्या खुद बदल सकती हैं।</div>
+    <div class="small-note">हर प्रश्न, A/B/C/D, सही उत्तर और व्याख्या की TTS भाषा अलग-अलग चुनी जा सकती है।</div>
   </div>
 </section>
 
@@ -96,7 +98,7 @@ h1{font-size:clamp(29px,8vw,42px);line-height:1.06;margin:0;font-weight:950;lett
   </div>
   <div class="bar"><i id="progressBar"></i></div>
   <div class="quiz-ticker" aria-label="स्वागत संदेश"><div class="quiz-ticker-track"><span>अंजली अवस्थी फेसबुक प्रोफाइल पर आपका हार्दिक स्वागत है। आइए, आज कुछ धार्मिक प्रश्नों पर विचार करें।</span></div></div>
-  <div class="qcontent"><img id="quizPhoto" class="quiz-photo" alt="Quiz photo"><div id="questionText" class="question">प्रश्न…</div><div id="ttsStatus" class="tts">🎙️ TTS तैयार हो रहा है…</div><div id="answers" class="answers"></div><div class="hint">पहले TTS • फिर 5 सेकंड countdown • फिर उत्तर और व्याख्या</div></div>
+  <div class="qcontent"><img id="quizPhoto" class="quiz-photo" alt="Quiz photo"><div id="questionText" class="question">प्रश्न…</div><div id="ttsStatus" class="tts">🎙️ TTS तैयार हो रहा है…</div><div id="answers" class="answers"></div><div class="hint">पहले प्रश्न • फिर A/B/C/D • फिर 5 सेकंड countdown • फिर उत्तर और पूरी व्याख्या</div></div>
   <div id="timerOverlay" class="timer-overlay"><div class="timer-ring"><div id="timerValue" class="timer-number">5</div><div class="timer-caption">उत्तर चुनें</div></div></div>
 </section>
 
@@ -123,38 +125,64 @@ h1{font-size:clamp(29px,8vw,42px);line-height:1.06;margin:0;font-weight:950;lett
 
 const TIMER_SECONDS = 5;
 
+const LANGUAGE_OPTIONS = [
+  {value:'auto', label:'🤖 स्वतः पहचान (Auto)'},
+  {value:'hi-IN', label:'🇮🇳 हिंदी आवाज़'},
+  {value:'sa-IN', label:'🕉️ संस्कृत आवाज़'},
+  {value:'vedic-sa', label:'📜 वैदिक संस्कृत (Sanskrit)'}
+];
+
 const defaultQuestions = [
-  {question:"भारत की राजधानी क्या है?",options:{A:"मुंबई",B:"नई दिल्ली",C:"कोलकाता",D:"चेन्नई"},answer:"B",explanation:"भारत की राजधानी नई दिल्ली है। यह केंद्र सरकार, संसद और प्रमुख राष्ट्रीय संस्थानों का प्रशासनिक केंद्र है।"},
-  {question:"भारत का राष्ट्रीय पशु कौन सा है?",options:{A:"सिंह",B:"हाथी",C:"बाघ",D:"मोर"},answer:"C",explanation:"बाघ भारत का राष्ट्रीय पशु है। यह शक्ति, साहस और वन्य जैव विविधता का महत्वपूर्ण प्रतीक है।"},
-  {question:"भारत का राष्ट्रीय फूल कौन सा है?",options:{A:"गुलाब",B:"कमल",C:"चमेली",D:"गेंदा"},answer:"B",explanation:"कमल भारत का राष्ट्रीय फूल है और भारतीय संस्कृति में पवित्रता तथा सुंदरता से जुड़ा महत्वपूर्ण प्रतीक है।"},
-  {question:"पृथ्वी का एकमात्र प्राकृतिक उपग्रह कौन सा है?",options:{A:"सूर्य",B:"मंगल",C:"चंद्रमा",D:"शुक्र"},answer:"C",explanation:"चंद्रमा पृथ्वी का एकमात्र प्राकृतिक उपग्रह है और वह पृथ्वी की परिक्रमा करता है।"},
-  {question:"भारत का राष्ट्रीय ध्वज किस आकार का है?",options:{A:"वर्गाकार",B:"आयताकार",C:"त्रिभुजाकार",D:"वृत्ताकार"},answer:"B",explanation:"भारत का राष्ट्रीय ध्वज आयताकार होता है और इसमें तीन क्षैतिज पट्टियां तथा बीच में अशोक चक्र होता है।"},
-  {question:"जल का रासायनिक सूत्र क्या है?",options:{A:"CO₂",B:"O₂",C:"H₂O",D:"NaCl"},answer:"C",explanation:"जल का रासायनिक सूत्र H₂O है। एक अणु में दो हाइड्रोजन और एक ऑक्सीजन परमाणु होते हैं।"},
-  {question:"सूर्य के सबसे निकट कौन सा ग्रह है?",options:{A:"शुक्र",B:"पृथ्वी",C:"बुध",D:"मंगल"},answer:"C",explanation:"बुध सूर्य के सबसे निकट स्थित ग्रह है और सौरमंडल का सबसे छोटा ग्रह भी है।"},
-  {question:"भारत में संविधान दिवस कब मनाया जाता है?",options:{A:"15 अगस्त",B:"26 जनवरी",C:"2 अक्टूबर",D:"26 नवंबर"},answer:"D",explanation:"भारत में संविधान दिवस 26 नवंबर को मनाया जाता है। इसी दिन 1949 में संविधान सभा ने संविधान को अंगीकृत किया था।"},
-  {question:"कंप्यूटर का मुख्य प्रसंस्करण भाग किस नाम से जाना जाता है?",options:{A:"CPU",B:"USB",C:"PDF",D:"HTML"},answer:"A",explanation:"CPU का अर्थ Central Processing Unit है। यह निर्देशों को संसाधित करने और गणनाएं करने का मुख्य भाग है।"},
-  {question:"भारत का राष्ट्रीय पक्षी कौन सा है?",options:{A:"तोता",B:"मोर",C:"कोयल",D:"हंस"},answer:"B",explanation:"मोर भारत का राष्ट्रीय पक्षी है और भारतीय प्राकृतिक तथा सांस्कृतिक पहचान का महत्वपूर्ण प्रतीक है।"}
+  {question:"भारत की राजधानी क्या है?",questionLang:'auto',options:{A:"मुंबई",B:"नई दिल्ली",C:"कोलकाता",D:"चेन्नई"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"B",answerLang:'auto',explanation:"भारत की राजधानी नई दिल्ली है। यह केंद्र सरकार, संसद और प्रमुख राष्ट्रीय संस्थानों का प्रशासनिक केंद्र है।",explanationLang:'auto'},
+  {question:"भारत का राष्ट्रीय पशु कौन सा है?",questionLang:'auto',options:{A:"सिंह",B:"हाथी",C:"बाघ",D:"मोर"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"C",answerLang:'auto',explanation:"बाघ भारत का राष्ट्रीय पशु है। यह शक्ति, साहस और वन्य जैव विविधता का महत्वपूर्ण प्रतीक है।",explanationLang:'auto'},
+  {question:"भारत का राष्ट्रीय फूल कौन सा है?",questionLang:'auto',options:{A:"गुलाब",B:"कमल",C:"चमेली",D:"गेंदा"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"B",answerLang:'auto',explanation:"कमल भारत का राष्ट्रीय फूल है और भारतीय संस्कृति में पवित्रता तथा सुंदरता से जुड़ा महत्वपूर्ण प्रतीक है।",explanationLang:'auto'},
+  {question:"पृथ्वी का एकमात्र प्राकृतिक उपग्रह कौन सा है?",questionLang:'auto',options:{A:"सूर्य",B:"मंगल",C:"चंद्रमा",D:"शुक्र"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"C",answerLang:'auto',explanation:"चंद्रमा पृथ्वी का एकमात्र प्राकृतिक उपग्रह है और वह पृथ्वी की परिक्रमा करता है।",explanationLang:'auto'},
+  {question:"भारत का राष्ट्रीय ध्वज किस आकार का है?",questionLang:'auto',options:{A:"वर्गाकार",B:"आयताकार",C:"त्रिभुजाकार",D:"वृत्ताकार"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"B",answerLang:'auto',explanation:"भारत का राष्ट्रीय ध्वज आयताकार होता है और इसमें तीन क्षैतिज पट्टियां तथा बीच में अशोक चक्र होता है।",explanationLang:'auto'},
+  {question:"जल का रासायनिक सूत्र क्या है?",questionLang:'auto',options:{A:"CO₂",B:"O₂",C:"H₂O",D:"NaCl"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"C",answerLang:'auto',explanation:"जल का रासायनिक सूत्र H₂O है। एक अणु में दो हाइड्रोजन और एक ऑक्सीजन परमाणु होते हैं।",explanationLang:'auto'},
+  {question:"सूर्य के सबसे निकट कौन सा ग्रह है?",questionLang:'auto',options:{A:"शुक्र",B:"पृथ्वी",C:"बुध",D:"मंगल"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"C",answerLang:'auto',explanation:"बुध सूर्य के सबसे निकट स्थित ग्रह है और सौरमंडल का सबसे छोटा ग्रह भी है।",explanationLang:'auto'},
+  {question:"भारत में संविधान दिवस कब मनाया जाता है?",questionLang:'auto',options:{A:"15 अगस्त",B:"26 जनवरी",C:"2 अक्टूबर",D:"26 नवंबर"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"D",answerLang:'auto',explanation:"भारत में संविधान दिवस 26 नवंबर को मनाया जाता है। इसी दिन 1949 में संविधान सभा ने संविधान को अंगीकृत किया था।",explanationLang:'auto'},
+  {question:"कंप्यूटर का मुख्य प्रसंस्करण भाग किस नाम से जाना जाता है?",questionLang:'auto',options:{A:"CPU",B:"USB",C:"PDF",D:"HTML"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"A",answerLang:'auto',explanation:"CPU का अर्थ Central Processing Unit है। यह निर्देशों को संसाधित करने और गणनाएं करने का मुख्य भाग है।",explanationLang:'auto'},
+  {question:"भारत का राष्ट्रीय पक्षी कौन सा है?",questionLang:'auto',options:{A:"तोता",B:"मोर",C:"कोयल",D:"हंस"},optionLangs:{A:'auto',B:'auto',C:'auto',D:'auto'},answer:"B",answerLang:'auto',explanation:"मोर भारत का राष्ट्रीय पक्षी है और भारतीय प्राकृतिक तथा सांस्कृतिक पहचान का महत्वपूर्ण प्रतीक है।",explanationLang:'auto'}
 ];
 
 let questions = structuredClone(defaultQuestions);
-const state = {i:0,score:0,selected:null,timer:null,muted:false,voices:[],speechId:0};
+const state = {i:0,score:0,selected:null,timer:null,muted:false,voices:[],speechSession:0,phase:'idle'};
 const $ = id => document.getElementById(id);
 const screens = [$('startScreen'),$('editorScreen'),$('quizScreen'),$('revealScreen'),$('resultScreen')];
 
 function show(screen){screens.forEach(s=>s.classList.remove('active'));screen.classList.add('active')}
-function stopAll(){clearInterval(state.timer);state.timer=null;if('speechSynthesis' in window)speechSynthesis.cancel();state.speechId++}
+function stopAll(){clearInterval(state.timer);state.timer=null;state.phase='idle';if('speechSynthesis' in window)speechSynthesis.cancel();state.speechSession++}
 function esc(s){return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
+function ensureQuestionShape(q){
+  q.questionLang=q.questionLang||'auto';
+  q.optionLangs=q.optionLangs||{};
+  ['A','B','C','D'].forEach(k=>{q.optionLangs[k]=q.optionLangs[k]||'auto'});
+  q.answerLang=q.answerLang||'auto';
+  q.explanationLang=q.explanationLang||'auto';
+  return q;
+}
+
+function langOptions(selected='auto'){
+  return LANGUAGE_OPTIONS.map(o=>`<option value="${o.value}" ${o.value===selected?'selected':''}>${o.label}</option>`).join('');
+}
+
 function renderEditor(){
+  questions.forEach(ensureQuestionShape);
   const list=$('editorList'); list.innerHTML='';
   questions.forEach((q,i)=>{
     const card=document.createElement('div'); card.className='editor-card'; card.dataset.index=i;
     card.innerHTML=`
       <h3>प्रश्न ${i+1}</h3>
       <div class="field"><label>प्रश्न</label><textarea data-k="question">${esc(q.question)}</textarea></div>
-      <div class="opt-grid">${['A','B','C','D'].map(k=>`<div class="field"><label>विकल्प ${k}</label><input data-opt="${k}" value="${esc(q.options[k])}"></div>`).join('')}</div>
+      <div class="field"><label>प्रश्न की TTS भाषा</label><select data-k="questionLang">${langOptions(q.questionLang)}</select><div class="lang-help">Auto में text देखकर हिंदी/संस्कृत/वैदिक संस्कृत का निर्णय होगा।</div></div>
+      <div class="opt-grid">
+        ${['A','B','C','D'].map(k=>`<div class="field"><label>विकल्प ${k}</label><input data-opt="${k}" value="${esc(q.options[k])}"><select data-opt-lang="${k}">${langOptions(q.optionLangs[k])}</select></div>`).join('')}
+      </div>
       <div class="field"><label>सही उत्तर चुनें</label><select data-k="answer">${['A','B','C','D'].map(k=>`<option value="${k}" ${q.answer===k?'selected':''}>${k} — ${esc(q.options[k])}</option>`).join('')}</select></div>
+      <div class="field"><label>सही उत्तर की TTS भाषा</label><select data-k="answerLang">${langOptions(q.answerLang)}</select></div>
       <div class="field"><label>उत्तर की व्याख्या</label><textarea data-k="explanation">${esc(q.explanation)}</textarea></div>
+      <div class="field"><label>व्याख्या की TTS भाषा</label><select data-k="explanationLang">${langOptions(q.explanationLang)}</select></div>
       <div class="field photo-field">
         <div><label>प्रश्न के साथ फोटो (वैकल्पिक)</label><input type="file" accept="image/*" data-photo><div class="photo-help">फोटो पूरी दिखाई जाएगी; crop नहीं होगी।</div></div>
         <img class="photo-preview ${q.photo?'show':''}" src="${q.photo||''}" alt="preview">
@@ -167,34 +195,52 @@ function renderEditor(){
       reader.onload=()=>{questions[i].photo=reader.result;const img=card.querySelector('.photo-preview');img.src=reader.result;img.classList.add('show')};
       reader.readAsDataURL(file);
     });
+    const answerSelect=card.querySelector('[data-k="answer"]');
+    ['A','B','C','D'].forEach(k=>card.querySelector(`[data-opt="${k}"]`).addEventListener('input',()=>{
+      const val=card.querySelector(`[data-opt="${k}"]`).value;
+      const opt=answerSelect.querySelector(`option[value="${k}"]`); if(opt)opt.textContent=`${k} — ${val}`;
+    }));
   });
 }
 
 function readEditor(){
   document.querySelectorAll('.editor-card').forEach(card=>{
-    const i=Number(card.dataset.index);
-    questions[i].question=card.querySelector('[data-k="question"]').value.trim();
-    questions[i].explanation=card.querySelector('[data-k="explanation"]').value.trim();
-    questions[i].answer=card.querySelector('[data-k="answer"]').value;
-    ['A','B','C','D'].forEach(k=>{questions[i].options[k]=card.querySelector(`[data-opt="${k}"]`).value.trim()});
+    const i=Number(card.dataset.index); const q=ensureQuestionShape(questions[i]);
+    q.question=card.querySelector('[data-k="question"]').value.trim();
+    q.questionLang=card.querySelector('[data-k="questionLang"]').value;
+    q.explanation=card.querySelector('[data-k="explanation"]').value.trim();
+    q.explanationLang=card.querySelector('[data-k="explanationLang"]').value;
+    q.answer=card.querySelector('[data-k="answer"]').value;
+    q.answerLang=card.querySelector('[data-k="answerLang"]').value;
+    ['A','B','C','D'].forEach(k=>{q.options[k]=card.querySelector(`[data-opt="${k}"]`).value.trim();q.optionLangs[k]=card.querySelector(`[data-opt-lang="${k}"]`).value});
   });
 }
 
-function loadVoices(){if(!('speechSynthesis' in window))return;state.voices=speechSynthesis.getVoices()}
+function loadVoices(){if(!('speechSynthesis' in window))return;state.voices=speechSynthesis.getVoices()||[]}
 function findVoice(lang){
   const prefix=String(lang||'hi-IN').toLowerCase().split('-')[0];
   const exact=state.voices.filter(v=>String(v.lang).toLowerCase().startsWith(prefix));
   const pool=exact.length?exact:state.voices;
-  const female=pool.find(v=>/female|woman|zira|neerja|kalpana|raveena|heera|swara|aditi|priya|veena|lekha/i.test(v.name+' '+v.voiceURI));
+  const female=pool.find(v=>/female|woman|zira|neerja|kalpana|raveena|heera|swara|aditi|priya|veena|lekha|google.*female/i.test(v.name+' '+v.voiceURI));
   return female||pool[0]||null;
 }
 
-/* Automatic Hindi/Sanskrit detection.
-   Devanagari alone cannot identify Hindi vs Sanskrit with 100% certainty,
-   so the detector combines a Sanskrit lexicon, common Sanskrit inflections,
-   and Hindi stopwords. Each spoken text block is analysed independently. */
+/*
+  Automatic Hindi/Sanskrit/Vedic-Sanskrit detection.
+  Devanagari text alone is not enough for perfect detection, so this uses:
+  1) strong Vedic markers,
+  2) Sanskrit lexicon,
+  3) Sanskrit grammatical endings,
+  4) Hindi stopwords and common endings.
+  Vedic Sanskrit still uses the Sanskrit TTS locale (sa-IN), because browser
+  speech engines generally do not expose a separate Vedic Sanskrit locale.
+*/
+const VEDIC_WORDS = new Set([
+  'ॐ','ओम्','अग्निः','अग्ने','इन्द्रः','इन्द्र','सोमः','सोम','वरुणः','वरुण','मित्रः','मित्र','अश्विनौ','अश्विन','मरुतः','मरुत्','उषाः','उषस्','सविता','सवितुः','सूर्यः','सूर्य','पूषा','पूषन्','वायुः','वायु','आपः','आपस्','पर्जन्यः','पर्जन्य','पृथिवी','पृथ्वी','द्यौः','द्यावापृथिवी','ऋतम्','ऋत','सत्यं','सत्यम्','यज्ञः','यज्ञम्','यज्ञ','यजु','हविः','हविष्','हव्यम्','होता','होतृ','अध्वर्यु','उद्गाता','उद्गातृ','ब्रह्मा','ब्रह्मन्','ऋषिः','ऋषि','मन्त्रः','मन्त्र','मंत्र','ऋचा','ऋचः','ऋचम्','सूक्तम्','सूक्त','वेदः','वेद','स्वाहा','स्वधा','वषट्','वौषट्','हौत्र','यजति','यजते','जुहोति','जुह्वति','ईडे','ईळे','उपास्महे','प्रणवः','गायत्री','त्रिष्टुप्','त्रिष्टुभ्','जगती','अनुष्टुप्','उषस्','आदित्याः','आदित्य','विश्वेदेवाः','विश्वेदेव','अदितिः','अदिति','सरस्वती','बृहस्पतिः','बृहस्पति','त्वष्टा','त्वष्टृ','अर्यमन्','भगः','रुद्रः','रुद्र','विष्णुः','विष्णु','वाक्','वाचम्','वाचः','श्रुतिः','श्रुति','ब्राह्मणम्','ब्राह्मण','आरण्यकम्','आरण्यक','उपनिषद्','उपनिषत्','ऋग्वेदः','ऋग्वेद','यजुर्वेदः','यजुर्वेद','सामवेदः','सामवेद','अथर्ववेदः','अथर्ववेद','संहिता','मण्डलम्','मण्डल','ऋचा','ऋचम्'
+]);
+
 const SANSKRIT_WORDS = new Set([
-  'अहम्','त्वम्','किम्','कः','कः','का','के','कानि','यः','या','यत्','यम्','यस्मिन्',
+  'अहम्','अहं','त्वम्','त्वं','किम्','कः','का','के','कानि','यः','या','यत्','यम्','यस्मिन्',
   'तत्','तम्','ते','तानि','एषः','एषा','एतत्','इदम्','इयम्','अस्ति','स्तः','सन्ति',
   'भवति','भवतः','भवन्ति','करोति','कुरुते','गच्छति','गच्छन्ति','पठति','पठन्ति',
   'लिखति','लिखन्ति','वदति','वदन्ति','नमः','रामः','रामम्','रामस्य','रामेण','रामाय',
@@ -202,7 +248,10 @@ const SANSKRIT_WORDS = new Set([
   'गुरुम्','गुरोः','विद्या','विद्यायाः','धर्मः','धर्मम्','संस्कृतम्','संस्कृतभाषा',
   'प्रश्नः','प्रश्नम्','उत्तरम्','व्याख्या','अर्थः','कथम्','कुत्र','कदा','कस्मात्',
   'तत्र','अत्र','यत्र','तत्रैव','एव','च','वा','अपि','हि','नूनम्','सदा','अद्य',
-  'श्वः','अधुना','भवतः','भवती','भवन्तः','अस्माकम्','युष्माकम्'
+  'श्वः','अधुना','भवति','भवतः','भवती','भवन्तः','अस्माकम्','युष्माकम्','माता','पिता',
+  'गुरुः','शिष्यः','ज्ञानम्','विद्वान्','पुत्रः','पुत्री','नरः','नारी','वनम्','जलम्',
+  'सूर्यः','चन्द्रः','भूमिः','आकाशम्','देवता','पूजा','मन्दिरम्','मोक्षः','कर्म','कर्मः',
+  'आत्मा','आत्मन्','जीवः','ब्रह्म','ब्रह्मन्','शान्तिः','शिवाय','नमः','स्वस्ति','मङ्गलम्'
 ]);
 
 const HINDI_WORDS = new Set([
@@ -212,178 +261,189 @@ const HINDI_WORDS = new Set([
   'बताइए','बताएं','बताओ','कब','कहाँ','क्यों','कैसे','कितना','कितनी','कितने',
   'आपका','आपकी','आपके','सही','गलत','उत्तर','प्रश्न','व्याख्या','राजधानी','राष्ट्रीय',
   'फूल','पशु','पक्षी','ध्वज','दिन','मनाया','जाता','कहते','नाम','किसे','किसको','वाला',
-  'वाली','वाले','एक','दो','तीन','चार','पाँच','पहला','दूसरा','तीसरा','चौथा'
+  'वाली','वाले','एक','दो','तीन','चार','पाँच','पहला','दूसरा','तीसरा','चौथा','यहाँ',
+  'वहाँ','हम','हमारा','हमारी','आप','उनका','उनकी','उनके','लिए','द्वारा','बाद','पहले',
+  'हो','होने','रहा','रही','रहे','गया','गई','गए','किया','कर','सकता','सकती','सकते'
 ]);
 
 function normalizeWord(word){
-  return word
-    .replace(/[^\u0900-\u097F]/gu,'')
-    .replace(/[।,;:!?()\[\]{}"'“”‘’]/gu,'')
-    .trim();
+  return word.replace(/[^\u0900-\u097F]/gu,'').replace(/[।,;:!?()\[\]{}"“”‘’]/gu,'').trim();
 }
-
+function isVedicWord(word){return VEDIC_WORDS.has(normalizeWord(word))}
 function isSanskritWord(word){
-  const w=normalizeWord(word);
-  if(!w) return false;
-  if(SANSKRIT_WORDS.has(w)) return true;
+  const w=normalizeWord(word); if(!w)return false;
+  if(SANSKRIT_WORDS.has(w))return true;
   return /(?:ः|म्|भिः|भ्यः|स्य|स्याः|स्मिन्|स्मात्|ेण|ेभ्यः|ेषु|योः|औः|अस्य|इत्य|त्वा|तुम्|न्ति|न्तः|न्तम्|तव्य|नीय|वान्|वती)$/u.test(w);
 }
-
 function isHindiWord(word){
-  const w=normalizeWord(word);
-  if(!w) return false;
-  if(HINDI_WORDS.has(w)) return true;
+  const w=normalizeWord(word); if(!w)return false;
+  if(HINDI_WORDS.has(w))return true;
   return /(?:ता|ती|ते|ना|ने|नी|गा|गी|गे|करते|करता|करती|जाता|जाती|जाते|होगा|होगी|होंगे)$/u.test(w);
 }
 
 function detectLanguage(text){
-  const raw=String(text||'').trim();
-  if(!raw) return 'hi-IN';
-  const words=raw.split(/\s+/u);
-  let sa=0, hi=0;
+  const raw=String(text||'').trim(); if(!raw)return 'hi-IN';
+  const words=raw.split(/\s+/u); let vedic=0,sa=0,hi=0;
   for(const word of words){
+    if(isVedicWord(word)) vedic+=4;
     if(isSanskritWord(word)) sa+=2;
     if(isHindiWord(word)) hi+=2;
   }
-  if(/[ः॥]/u.test(raw)) sa+=2;
-  if(/\b(?:है|हैं|क्या|कौन|कहाँ|क्यों|कैसे|में|से|को)\b/u.test(raw)) hi+=2;
+  if(/[ॐ॥]/u.test(raw)) vedic+=5;
+  if(/(?:ऋचा|सूक्त|यज्ञ|हविः|स्वाहा|स्वधा|वषट्|ऋग्वेद|यजुर्वेद|सामवेद|अथर्ववेद|गायत्री|त्रिष्टुप्|जगती)/u.test(raw)) vedic+=5;
+  if(/[ः]/u.test(raw)) sa+=1;
+  if(/\b(?:है|हैं|क्या|कौन|कहाँ|क्यों|कैसे|में|से|को|पर|और)\b/u.test(raw)) hi+=3;
+  if(vedic>=Math.max(4,sa) && vedic>hi) return 'sa-IN';
   if(sa>hi && sa>=2) return 'sa-IN';
   return 'hi-IN';
 }
 
-function detectMixedSegments(text){
-  const parts=String(text||'').trim().split(/(\s+)/u);
-  const segments=[];
-  let currentLang=null;
-  let buffer='';
-  for(const part of parts){
-    if(/^\s+$/u.test(part)){ buffer+=part; continue; }
-    const lang=detectLanguage(part);
-    if(currentLang===null){ currentLang=lang; buffer+=part; continue; }
-    if(lang===currentLang){ buffer+=part; continue; }
-    if(buffer.trim()) segments.push({lang:currentLang,text:buffer.trim()});
-    currentLang=lang; buffer=part;
-  }
-  if(buffer.trim()) segments.push({lang:currentLang||'hi-IN',text:buffer.trim()});
-  return segments.length?segments:[{lang:'hi-IN',text:String(text||'')}];
+function languageLabel(lang){return lang==='sa-IN'?'संस्कृत':'हिंदी'}
+function resolveLang(override,text){
+  if(override==='hi-IN')return 'hi-IN';
+  if(override==='sa-IN' || override==='vedic-sa')return 'sa-IN';
+  return detectLanguage(text);
 }
 
-function speakSegments(text,done,runId=state.speechId){
-  if(state.muted||!('speechSynthesis' in window)){done?.();return}
-  const id=runId;
-  const segments=detectMixedSegments(text);
-  let index=0;
-  function next(){
-    if(id!==state.speechId)return;
-    if(index>=segments.length){done?.();return;}
-    const seg=segments[index++];
-    $('ttsStatus').textContent=`🔊 ${seg.lang==='sa-IN'?'संस्कृत':'हिंदी'} आवाज़…`;
-    const u=new SpeechSynthesisUtterance(seg.text);
-    const voice=findVoice(seg.lang);
-    if(voice)u.voice=voice;
-    u.lang=voice?.lang||seg.lang;
-    u.rate=seg.lang==='sa-IN'?0.78:0.92;
-    u.pitch=1.08;
-    u.volume=1;
-    u.onend=next;
-    u.onerror=next;
-    speechSynthesis.speak(u);
+function splitMixedText(text,baseLangOverride='auto'){
+  const raw=String(text||'').trim();
+  if(!raw)return [];
+  if(baseLangOverride && baseLangOverride!=='auto') return [{lang:resolveLang(baseLangOverride,raw),text:raw}];
+  /* For Auto, split only when a clear language switch is found.
+     This avoids fighting the browser over a single utterance. */
+  const tokens=raw.split(/(\s+)/u); const pieces=[]; let currentLang=null; let buf='';
+  for(const token of tokens){
+    if(/^\s+$/u.test(token)){buf+=token;continue}
+    const l=detectLanguage(token);
+    if(currentLang===null){currentLang=l;buf+=token;continue}
+    if(l===currentLang){buf+=token;continue}
+    if(buf.trim())pieces.push({lang:currentLang,text:buf.trim()});
+    currentLang=l;buf=token;
   }
+  if(buf.trim())pieces.push({lang:currentLang||detectLanguage(raw),text:buf.trim()});
+  if(pieces.length>8) return [{lang:detectLanguage(raw),text:raw}];
+  return pieces.length?pieces:[{lang:detectLanguage(raw),text:raw}];
+}
+
+function safeSpeak(text,lang,onDone,session){
+  if(session!==state.speechSession || state.muted){onDone?.();return}
+  if(!('speechSynthesis' in window)){onDone?.();return}
+  const u=new SpeechSynthesisUtterance(String(text||'')); const voice=findVoice(lang); if(voice)u.voice=voice;
+  u.lang=voice?.lang||lang; u.rate=lang==='sa-IN'?0.80:0.93; u.pitch=1.06; u.volume=1;
+  let finished=false;
+  const finish=()=>{if(finished)return;finished=true;clearTimeout(watchdog);onDone?.()};
+  u.onend=finish;u.onerror=finish;
+  const watchdog=setTimeout(finish,Math.max(9000,String(text||'').length*105));
+  try{speechSynthesis.resume();speechSynthesis.speak(u)}catch(e){finish()}
+}
+
+function speakTextBlock(text,override,session,done){
+  const raw=String(text||'').replace(/\s+/g,' ').trim();
+  if(!raw){done?.();return}
+  const segments=splitMixedText(raw,override); let index=0;
+  const next=()=>{
+    if(session!==state.speechSession || state.muted){done?.();return}
+    if(index>=segments.length){done?.();return}
+    const seg=segments[index++]; $('ttsStatus').textContent=`🔊 ${languageLabel(seg.lang)} आवाज़…`;
+    safeSpeak(seg.text,seg.lang,next,session);
+  };
   next();
 }
 
-function speakOne(text,done){
-  const runId=++state.speechId;
-  speechSynthesis.cancel();
-  speakSegments(text,done,runId);
-}
-
+/* One stable session controls the entire chain. Internal language handling
+   never changes speechSession, which prevents the sequence from stopping
+   after the first question/options item. */
 function speakSequence(items,done){
-  if(state.muted||!('speechSynthesis' in window)){done?.();return}
-  const runId=++state.speechId;
+  if(state.muted || !('speechSynthesis' in window)){done?.();return}
+  const session=++state.speechSession;
   speechSynthesis.cancel();
   let index=0;
-  function next(){
-    if(runId!==state.speechId)return;
-    if(index>=items.length){done?.();return;}
-    const text=String(items[index++]).replace(/\s+/g,' ').trim();
-    $('ttsStatus').textContent=`🔊 ${index}/${items.length} पढ़ा जा रहा है…`;
-    speakSegments(text,next,runId);
-  }
+  const next=()=>{
+    if(session!==state.speechSession || state.muted)return;
+    if(index>=items.length){done?.();return}
+    const item=items[index++];
+    const label=item.label||`${index}/${items.length}`;
+    $('ttsStatus').textContent=`🔊 ${label} पढ़ा जा रहा है…`;
+    speakTextBlock(item.text,item.lang||'auto',session,next);
+  };
   next();
+}
+
+function speakOnce(text,override,done){
+  if(state.muted || !('speechSynthesis' in window)){done?.();return}
+  const session=++state.speechSession;
+  speechSynthesis.cancel();
+  speakTextBlock(text,override||'auto',session,done);
 }
 
 function sayTimer(value,preferredLang='hi-IN',done){
-  if(state.muted||!('speechSynthesis' in window)){done?.();return}
+  if(state.muted || !('speechSynthesis' in window)){done?.();return}
   speechSynthesis.cancel();
-  const text=String(value);
-  const lang=(/^\d+$/u.test(text)||text==='समय समाप्त')?preferredLang:detectLanguage(text);
-  const u=new SpeechSynthesisUtterance(text);
-  const voice=findVoice(lang);
-  if(voice)u.voice=voice;
-  u.lang=voice?.lang||lang;
-  u.rate=1.05;
-  u.pitch=1.12;
-  u.volume=1;
-  u.onend=()=>done?.();
-  u.onerror=()=>done?.();
-  speechSynthesis.speak(u);
+  const text=String(value); const lang=preferredLang==='sa-IN'?'sa-IN':detectLanguage(text);
+  const voice=findVoice(lang); const u=new SpeechSynthesisUtterance(text);
+  if(voice)u.voice=voice; u.lang=voice?.lang||lang;u.rate=1.05;u.pitch=1.1;u.volume=1;
+  let finished=false; const finish=()=>{if(finished)return;finished=true;clearTimeout(timerWatchdog);done?.()};
+  u.onend=finish;u.onerror=finish;
+  const timerWatchdog=setTimeout(finish,3500);
+  try{speechSynthesis.resume();speechSynthesis.speak(u)}catch(e){finish()}
 }
 
 function renderQuestion(){
-  stopAll(); const q=questions[state.i]; state.selected=null;
-  $('currentQuestion').textContent=state.i+1; $('totalQuestions').textContent=questions.length; $('progressBar').style.width=`${(state.i/questions.length)*100}%`;
+  stopAll(); const q=ensureQuestionShape(questions[state.i]); state.selected=null; state.phase='reading';
+  $('currentQuestion').textContent=state.i+1; $('totalQuestions').textContent=questions.length; $('progressBar').style.width=`${((state.i+1)/questions.length)*100}%`;
   $('questionText').textContent=q.question;
   const photo=$('quizPhoto'); if(q.photo){photo.src=q.photo;photo.style.display='block'}else{photo.removeAttribute('src');photo.style.display='none'}
   $('timerOverlay').classList.remove('show','danger'); $('timerValue').textContent=TIMER_SECONDS; $('answers').innerHTML='';
   ['A','B','C','D'].forEach(k=>{const b=document.createElement('button');b.className='option';b.type='button';b.innerHTML=`<span class="key">${k}</span><span class="txt">${esc(q.options[k])}</span>`;b.onclick=()=>selectAnswer(k);$('answers').appendChild(b)});
   show($('quizScreen')); $('ttsStatus').textContent='🔊 प्रश्न और विकल्प सुनिए…';
   speakSequence([
-    `प्रश्न ${state.i+1}। ${q.question}`,
-    `विकल्प A। ${q.options.A}`,
-    `विकल्प B। ${q.options.B}`,
-    `विकल्प C। ${q.options.C}`,
-    `विकल्प D। ${q.options.D}`
+    {label:'प्रश्न',text:`प्रश्न ${state.i+1}। ${q.question}`,lang:q.questionLang},
+    {label:'विकल्प A',text:`विकल्प A। ${q.options.A}`,lang:q.optionLangs.A},
+    {label:'विकल्प B',text:`विकल्प B। ${q.options.B}`,lang:q.optionLangs.B},
+    {label:'विकल्प C',text:`विकल्प C। ${q.options.C}`,lang:q.optionLangs.C},
+    {label:'विकल्प D',text:`विकल्प D। ${q.options.D}`,lang:q.optionLangs.D}
   ],startTimer);
 }
 
 function selectAnswer(k){
-  if(state.timer===null)return;
+  if(state.timer===null || state.phase!=='countdown')return;
   state.selected=k;
   document.querySelectorAll('.option').forEach(b=>b.classList.toggle('selected',b.querySelector('.key').textContent===k));
 }
 
 function startTimer(){
-  if(state.timer!==null)return;
-  const q=questions[state.i];
-  const preferredLang=detectLanguage(q.question);
-  state.timer=TIMER_SECONDS;
-  $('timerOverlay').classList.add('show');
-  $('timerValue').textContent=state.timer;
+  if(state.timer!==null || state.phase!=='reading')return;
+  const q=questions[state.i]; const preferredLang=resolveLang(q.questionLang,q.question);
+  state.phase='countdown'; state.timer=TIMER_SECONDS;
+  $('timerOverlay').classList.add('show'); $('timerValue').textContent=state.timer;
   sayTimer(state.timer,preferredLang);
   const timerId=window.setInterval(()=>{
     state.timer--;
     if(state.timer<=0){
-      clearInterval(timerId);
-      state.timer=null;
-      $('timerValue').textContent='0';
+      clearInterval(timerId); state.timer=null; $('timerValue').textContent='0'; $('timerOverlay').classList.remove('danger'); state.phase='ending';
       sayTimer('समय समाप्त',preferredLang,reveal);
+      if(state.muted)reveal();
       return;
     }
     $('timerValue').textContent=state.timer;
     if(state.timer<=2)$('timerOverlay').classList.add('danger');
     sayTimer(state.timer,preferredLang);
   },1000);
+  state.timerId=timerId;
 }
 
 function reveal(){
-  stopAll(); const q=questions[state.i];
+  if(state.phase==='revealed')return;
+  state.phase='revealed'; clearInterval(state.timerId);state.timerId=null;state.timer=null; 
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  const q=ensureQuestionShape(questions[state.i]);
   document.querySelectorAll('.option').forEach(b=>{const k=b.querySelector('.key').textContent;b.disabled=true;if(k===q.answer)b.classList.add('correct');if(state.selected===k&&k!==q.answer)b.classList.add('incorrect')});
   if(state.selected===q.answer)state.score++;
+  $('timerOverlay').classList.remove('show','danger');
   $('revealAnswer').textContent=`विकल्प ${q.answer} — ${q.options[q.answer]}`; $('revealExplanation').textContent=q.explanation; $('nextCountdown').textContent='🔊 उत्तर और पूरी व्याख्या सुनिए…'; $('nextBtn').disabled=true; $('nextBtn').style.opacity='.45'; show($('revealScreen'));
   speakSequence([
-    `सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,
-    `व्याख्या। ${q.explanation}`
+    {label:'सही उत्तर',text:`सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,lang:q.answerLang},
+    {label:'व्याख्या',text:`व्याख्या। ${q.explanation}`,lang:q.explanationLang}
   ],()=>{
     $('nextCountdown').textContent='✓ पूरी व्याख्या पढ़ी गई। अगला प्रश्न शुरू हो रहा है…';
     $('nextBtn').disabled=false; $('nextBtn').style.opacity='1';
@@ -391,26 +451,23 @@ function reveal(){
   });
 }
 
-function nextQuestion(){
-  stopAll(); if(state.i<questions.length-1){state.i++;renderQuestion()}else showResult();
-}
-
+function nextQuestion(){stopAll();if(state.i<questions.length-1){state.i++;renderQuestion()}else showResult()}
 function showResult(){
   const total=questions.length,wrong=total-state.score,pct=total?Math.round(state.score/total*100):0;
-  $('resultScore').textContent=`${state.score}/${total}`; $('correctCount').textContent=state.score; $('wrongCount').textContent=wrong; $('percentCount').textContent=pct+'%';
-  $('resultSubtitle').textContent=pct>=80?'शानदार! Quiz पूरा हुआ।':pct>=50?'अच्छा प्रयास! फिर से खेलकर score बढ़ाएं।':'फिर से प्रयास करें और अपना score बेहतर बनाएं।'; show($('resultScreen'));
+  $('resultScore').textContent=`${state.score}/${total}`;$('correctCount').textContent=state.score;$('wrongCount').textContent=wrong;$('percentCount').textContent=pct+'%';
+  $('resultSubtitle').textContent=pct>=80?'शानदार! Quiz पूरा हुआ।':pct>=50?'अच्छा प्रयास! फिर से खेलकर score बढ़ाएं।':'फिर से प्रयास करें और अपना score बेहतर बनाएं।';show($('resultScreen'));
 }
 
 $('editBtn').onclick=()=>{stopAll();renderEditor();show($('editorScreen'))};
-$('editorBack').onclick=()=>{readEditor();show($('startScreen'))};
+$('editorBack').onclick=()=>{readEditor();$('startTotal').textContent=questions.length;show($('startScreen'))};
 $('saveEditor').onclick=()=>{readEditor();$('startTotal').textContent=questions.length;show($('startScreen'))};
 $('resetEditor').onclick=()=>{questions=structuredClone(defaultQuestions);renderEditor()};
-$('startBtn').onclick=()=>{stopAll();state.i=0;state.score=0;renderQuestion()};
+$('startBtn').onclick=()=>{stopAll();state.i=0;state.score=0;state.selected=null;renderQuestion()};
 $('quizBackBtn').onclick=()=>{stopAll();if(confirm('क्या आप Quiz से बाहर निकलना चाहती हैं? वर्तमान प्रश्न की progress समाप्त हो जाएगी।'))show($('startScreen'))};
-$('restartBtn').onclick=()=>{state.i=0;state.score=0;renderQuestion()};
-$('replayBtn').onclick=()=>{const q=questions[state.i];speakSequence([`प्रश्न ${state.i+1}। ${q.question}`,`विकल्प A। ${q.options.A}`,`विकल्प B। ${q.options.B}`,`विकल्प C। ${q.options.C}`,`विकल्प D। ${q.options.D}`],()=>{})};
+$('restartBtn').onclick=()=>{stopAll();state.i=0;state.score=0;renderQuestion()};
+$('replayBtn').onclick=()=>{const q=ensureQuestionShape(questions[state.i]);if(state.phase==='countdown'||state.phase==='ending')return;speakSequence([{label:'प्रश्न',text:`प्रश्न ${state.i+1}। ${q.question}`,lang:q.questionLang},{label:'विकल्प A',text:`विकल्प A। ${q.options.A}`,lang:q.optionLangs.A},{label:'विकल्प B',text:`विकल्प B। ${q.options.B}`,lang:q.optionLangs.B},{label:'विकल्प C',text:`विकल्प C। ${q.options.C}`,lang:q.optionLangs.C},{label:'विकल्प D',text:`विकल्प D। ${q.options.D}`,lang:q.optionLangs.D}],()=>{})};
 $('muteBtn').onclick=()=>{state.muted=!state.muted;$('muteBtn').textContent=state.muted?'🔇':'🔈';if(state.muted)stopAll()};
-$('replayRevealBtn').onclick=()=>{const q=questions[state.i];speakSequence([`सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,`व्याख्या। ${q.explanation}`],()=>{})};
+$('replayRevealBtn').onclick=()=>{const q=ensureQuestionShape(questions[state.i]);speakSequence([{label:'सही उत्तर',text:`सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,lang:q.answerLang},{label:'व्याख्या',text:`व्याख्या। ${q.explanation}`,lang:q.explanationLang}],()=>{})};
 $('nextBtn').onclick=()=>{if(!$('nextBtn').disabled)nextQuestion()};
 $('startTotal').textContent=questions.length;
 
