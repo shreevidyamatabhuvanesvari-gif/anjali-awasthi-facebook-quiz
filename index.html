@@ -189,51 +189,133 @@ function findVoice(lang){
   return female||pool[0]||null;
 }
 
-/* Heuristic text-language detection. Devanagari is shared by Hindi/Sanskrit,
-   so Sanskrit is identified through common Sanskrit markers. */
+/* Automatic Hindi/Sanskrit detection.
+   Devanagari alone cannot identify Hindi vs Sanskrit with 100% certainty,
+   so the detector combines a Sanskrit lexicon, common Sanskrit inflections,
+   and Hindi stopwords. Each spoken text block is analysed independently. */
+const SANSKRIT_WORDS = new Set([
+  'अहम्','त्वम्','किम्','कः','कः','का','के','कानि','यः','या','यत्','यम्','यस्मिन्',
+  'तत्','तम्','ते','तानि','एषः','एषा','एतत्','इदम्','इयम्','अस्ति','स्तः','सन्ति',
+  'भवति','भवतः','भवन्ति','करोति','कुरुते','गच्छति','गच्छन्ति','पठति','पठन्ति',
+  'लिखति','लिखन्ति','वदति','वदन्ति','नमः','रामः','रामम्','रामस्य','रामेण','रामाय',
+  'कृष्णः','कृष्णम्','कृष्णस्य','शिवः','शिवम्','देवः','देवम्','देवस्य','गुरुः',
+  'गुरुम्','गुरोः','विद्या','विद्यायाः','धर्मः','धर्मम्','संस्कृतम्','संस्कृतभाषा',
+  'प्रश्नः','प्रश्नम्','उत्तरम्','व्याख्या','अर्थः','कथम्','कुत्र','कदा','कस्मात्',
+  'तत्र','अत्र','यत्र','तत्रैव','एव','च','वा','अपि','हि','नूनम्','सदा','अद्य',
+  'श्वः','अधुना','भवतः','भवती','भवन्तः','अस्माकम्','युष्माकम्'
+]);
+
+const HINDI_WORDS = new Set([
+  'भारत','की','का','के','को','क्या','कौन','किस','किसका','किसकी','किसके','में','से',
+  'पर','और','या','यह','वह','ये','वे','है','हैं','था','थे','थी','होता','होती','होते',
+  'करना','करते','करता','करती','जाता','जाती','जाते','जाना','पढ़ना','पढ़ते','लिखना',
+  'बताइए','बताएं','बताओ','कब','कहाँ','क्यों','कैसे','कितना','कितनी','कितने',
+  'आपका','आपकी','आपके','सही','गलत','उत्तर','प्रश्न','व्याख्या','राजधानी','राष्ट्रीय',
+  'फूल','पशु','पक्षी','ध्वज','दिन','मनाया','जाता','कहते','नाम','किसे','किसको','वाला',
+  'वाली','वाले','एक','दो','तीन','चार','पाँच','पहला','दूसरा','तीसरा','चौथा'
+]);
+
+function normalizeWord(word){
+  return word
+    .replace(/[^\u0900-\u097F]/gu,'')
+    .replace(/[।,;:!?()\[\]{}"'“”‘’]/gu,'')
+    .trim();
+}
+
+function isSanskritWord(word){
+  const w=normalizeWord(word);
+  if(!w) return false;
+  if(SANSKRIT_WORDS.has(w)) return true;
+  return /(?:ः|म्|भिः|भ्यः|स्य|स्याः|स्मिन्|स्मात्|ेण|ेभ्यः|ेषु|योः|औः|अस्य|इत्य|त्वा|तुम्|न्ति|न्तः|न्तम्|तव्य|नीय|वान्|वती)$/u.test(w);
+}
+
+function isHindiWord(word){
+  const w=normalizeWord(word);
+  if(!w) return false;
+  if(HINDI_WORDS.has(w)) return true;
+  return /(?:ता|ती|ते|ना|ने|नी|गा|गी|गे|करते|करता|करती|जाता|जाती|जाते|होगा|होगी|होंगे)$/u.test(w);
+}
+
 function detectLanguage(text){
-  const s=String(text||'').trim();
-  const sanskritMarkers=[
-    'अहम्','त्वम्','किम्','कः','का','के','यः','यत्','तत्','एषः','एषा','एतत्',
-    'भवति','भवन्ति','अस्ति','करोति','गच्छति','पठति','लिखति','वदति','नमः',
-    'रामः','कृष्णः','शिवः','देवः','संस्कृत','प्रश्नोत्तर','विद्या','धर्मः',
-    '।','॥','ः'
-  ];
-  if(sanskritMarkers.some(m=>s.includes(m))) return 'sa-IN';
-  if(/(?:स्य|स्याः|ेन|ेभ्यः|ेषु|ेण|त्र|तः)/u.test(s)) return 'sa-IN';
+  const raw=String(text||'').trim();
+  if(!raw) return 'hi-IN';
+  const words=raw.split(/\s+/u);
+  let sa=0, hi=0;
+  for(const word of words){
+    if(isSanskritWord(word)) sa+=2;
+    if(isHindiWord(word)) hi+=2;
+  }
+  if(/[ः॥]/u.test(raw)) sa+=2;
+  if(/\b(?:है|हैं|क्या|कौन|कहाँ|क्यों|कैसे|में|से|को)\b/u.test(raw)) hi+=2;
+  if(sa>hi && sa>=2) return 'sa-IN';
   return 'hi-IN';
 }
 
-function speakOne(text,done){
+function detectMixedSegments(text){
+  const parts=String(text||'').trim().split(/(\s+)/u);
+  const segments=[];
+  let currentLang=null;
+  let buffer='';
+  for(const part of parts){
+    if(/^\s+$/u.test(part)){ buffer+=part; continue; }
+    const lang=detectLanguage(part);
+    if(currentLang===null){ currentLang=lang; buffer+=part; continue; }
+    if(lang===currentLang){ buffer+=part; continue; }
+    if(buffer.trim()) segments.push({lang:currentLang,text:buffer.trim()});
+    currentLang=lang; buffer=part;
+  }
+  if(buffer.trim()) segments.push({lang:currentLang||'hi-IN',text:buffer.trim()});
+  return segments.length?segments:[{lang:'hi-IN',text:String(text||'')}];
+}
+
+function speakSegments(text,done){
   if(state.muted||!('speechSynthesis' in window)){done?.();return}
-  const id=++state.speechId; speechSynthesis.cancel();
-  const lang=detectLanguage(text); const u=new SpeechSynthesisUtterance(String(text).replace(/\s+/g,' ').trim());
-  const voice=findVoice(lang); if(voice)u.voice=voice;
-  u.lang=voice?.lang||lang; u.rate=lang==='sa-IN'?0.78:0.92; u.pitch=1.08; u.volume=1;
-  u.onstart=()=>{$('ttsStatus').textContent='🔊 आवाज़ चल रही है…'};
-  u.onend=()=>{if(id===state.speechId)done?.()};
-  u.onerror=()=>{if(id===state.speechId)done?.()};
-  speechSynthesis.speak(u);
+  const id=++state.speechId;
+  speechSynthesis.cancel();
+  const segments=detectMixedSegments(text);
+  let index=0;
+  function next(){
+    if(id!==state.speechId)return;
+    if(index>=segments.length){done?.();return;}
+    const seg=segments[index++];
+    $('ttsStatus').textContent=`🔊 ${seg.lang==='sa-IN'?'संस्कृत':'हिंदी'} आवाज़…`;
+    const u=new SpeechSynthesisUtterance(seg.text);
+    const voice=findVoice(seg.lang);
+    if(voice)u.voice=voice;
+    u.lang=voice?.lang||seg.lang;
+    u.rate=seg.lang==='sa-IN'?0.78:0.92;
+    u.pitch=1.08;
+    u.volume=1;
+    u.onend=next;
+    u.onerror=next;
+    speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function speakOne(text,done){
+  speakSegments(text,done);
 }
 
 function speakSequence(items,done){
   if(state.muted||!('speechSynthesis' in window)){done?.();return}
-  const id=++state.speechId; speechSynthesis.cancel(); let index=0;
-  const next=()=>{
+  const id=++state.speechId;
+  speechSynthesis.cancel();
+  let index=0;
+  function next(){
     if(id!==state.speechId)return;
-    if(index>=items.length){done?.();return}
+    if(index>=items.length){done?.();return;}
     const text=String(items[index++]).replace(/\s+/g,' ').trim();
     $('ttsStatus').textContent=`🔊 ${index}/${items.length} पढ़ा जा रहा है…`;
-    const lang=detectLanguage(text); const u=new SpeechSynthesisUtterance(text); const voice=findVoice(lang); if(voice)u.voice=voice;
-    u.lang=voice?.lang||lang; u.rate=lang==='sa-IN'?0.78:0.92; u.pitch=1.08; u.volume=1; u.onend=next; u.onerror=next; speechSynthesis.speak(u);
-  };
+    speakSegments(text,next);
+  }
   next();
 }
 
-function sayTimer(value){
+function sayTimer(value,preferredLang='hi-IN'){
   if(state.muted||!('speechSynthesis' in window))return;
   speechSynthesis.cancel();
-  const text=String(value); const lang=detectLanguage(text); const u=new SpeechSynthesisUtterance(text); const voice=findVoice(lang); if(voice)u.voice=voice;
+  const text=String(value); const lang=(/^\d+$/u.test(text)||text==='समय समाप्त')?preferredLang:detectLanguage(text); const u=new SpeechSynthesisUtterance(text); const voice=findVoice(lang); if(voice)u.voice=voice;
   u.lang=voice?.lang||lang; u.rate=1.05; u.pitch=1.12; u.volume=1; speechSynthesis.speak(u);
 }
 
@@ -261,12 +343,26 @@ function selectAnswer(k){
 }
 
 function startTimer(){
-  if(state.timer!==null)return; state.timer=TIMER_SECONDS;
-  $('timerOverlay').classList.add('show'); $('timerValue').textContent=state.timer; sayTimer(state.timer);
+  if(state.timer!==null)return;
+  const q=questions[state.i];
+  const preferredLang=detectLanguage(q.question);
+  state.timer=TIMER_SECONDS;
+  $('timerOverlay').classList.add('show');
+  $('timerValue').textContent=state.timer;
+  sayTimer(state.timer,preferredLang);
   const timerId=window.setInterval(()=>{
     state.timer--;
-    if(state.timer<=0){clearInterval(timerId);state.timer=null;$('timerValue').textContent='0';sayTimer('समय समाप्त');window.setTimeout(reveal,260);return}
-    $('timerValue').textContent=state.timer; if(state.timer<=2)$('timerOverlay').classList.add('danger'); sayTimer(state.timer);
+    if(state.timer<=0){
+      clearInterval(timerId);
+      state.timer=null;
+      $('timerValue').textContent='0';
+      sayTimer('समय समाप्त',preferredLang);
+      window.setTimeout(reveal,260);
+      return;
+    }
+    $('timerValue').textContent=state.timer;
+    if(state.timer<=2)$('timerOverlay').classList.add('danger');
+    sayTimer(state.timer,preferredLang);
   },1000);
 }
 
