@@ -268,10 +268,9 @@ function detectMixedSegments(text){
   return segments.length?segments:[{lang:'hi-IN',text:String(text||'')}];
 }
 
-function speakSegments(text,done){
+function speakSegments(text,done,runId=state.speechId){
   if(state.muted||!('speechSynthesis' in window)){done?.();return}
-  const id=++state.speechId;
-  speechSynthesis.cancel();
+  const id=runId;
   const segments=detectMixedSegments(text);
   let index=0;
   function next(){
@@ -294,29 +293,41 @@ function speakSegments(text,done){
 }
 
 function speakOne(text,done){
-  speakSegments(text,done);
+  const runId=++state.speechId;
+  speechSynthesis.cancel();
+  speakSegments(text,done,runId);
 }
 
 function speakSequence(items,done){
   if(state.muted||!('speechSynthesis' in window)){done?.();return}
-  const id=++state.speechId;
+  const runId=++state.speechId;
   speechSynthesis.cancel();
   let index=0;
   function next(){
-    if(id!==state.speechId)return;
+    if(runId!==state.speechId)return;
     if(index>=items.length){done?.();return;}
     const text=String(items[index++]).replace(/\s+/g,' ').trim();
     $('ttsStatus').textContent=`🔊 ${index}/${items.length} पढ़ा जा रहा है…`;
-    speakSegments(text,next);
+    speakSegments(text,next,runId);
   }
   next();
 }
 
-function sayTimer(value,preferredLang='hi-IN'){
-  if(state.muted||!('speechSynthesis' in window))return;
+function sayTimer(value,preferredLang='hi-IN',done){
+  if(state.muted||!('speechSynthesis' in window)){done?.();return}
   speechSynthesis.cancel();
-  const text=String(value); const lang=(/^\d+$/u.test(text)||text==='समय समाप्त')?preferredLang:detectLanguage(text); const u=new SpeechSynthesisUtterance(text); const voice=findVoice(lang); if(voice)u.voice=voice;
-  u.lang=voice?.lang||lang; u.rate=1.05; u.pitch=1.12; u.volume=1; speechSynthesis.speak(u);
+  const text=String(value);
+  const lang=(/^\d+$/u.test(text)||text==='समय समाप्त')?preferredLang:detectLanguage(text);
+  const u=new SpeechSynthesisUtterance(text);
+  const voice=findVoice(lang);
+  if(voice)u.voice=voice;
+  u.lang=voice?.lang||lang;
+  u.rate=1.05;
+  u.pitch=1.12;
+  u.volume=1;
+  u.onend=()=>done?.();
+  u.onerror=()=>done?.();
+  speechSynthesis.speak(u);
 }
 
 function renderQuestion(){
@@ -356,8 +367,7 @@ function startTimer(){
       clearInterval(timerId);
       state.timer=null;
       $('timerValue').textContent='0';
-      sayTimer('समय समाप्त',preferredLang);
-      window.setTimeout(reveal,260);
+      sayTimer('समय समाप्त',preferredLang,reveal);
       return;
     }
     $('timerValue').textContent=state.timer;
