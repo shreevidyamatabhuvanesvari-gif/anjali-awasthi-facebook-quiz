@@ -23,7 +23,7 @@
 .quiz-back{width:42px!important;height:42px!important;font-size:19px}
 .qcontent{padding-top:11px;overflow:auto;scrollbar-width:none}
 .qcontent::-webkit-scrollbar{display:none}
-.quiz-photo{width:100%;max-height:185px;object-fit:cover;border-radius:22px;margin:0 0 10px;display:none;box-shadow:0 14px 34px rgba(0,0,0,.24);border:2px solid rgba(255,255,255,.24)}
+.quiz-photo{width:100%;max-height:185px;object-fit:contain;border-radius:22px;margin:0 0 10px;display:none;box-shadow:0 14px 34px rgba(0,0,0,.24);border:2px solid rgba(255,255,255,.24)}
 .question{font-size:clamp(22px,6.2vw,32px);min-height:112px;padding:19px 18px;overflow-wrap:anywhere;word-break:break-word}
 .answers{grid-template-columns:1fr;gap:10px;flex:none;margin-top:10px}
 .option{min-height:76px;width:100%;padding:12px 14px;align-items:flex-start;overflow:hidden}
@@ -31,7 +31,7 @@
 .option .txt{font-size:clamp(20px,5.7vw,27px);line-height:1.24;overflow-wrap:anywhere;word-break:break-word;white-space:normal;padding-top:2px}
 .explain{max-height:none;min-height:150px;font-size:clamp(18px,5vw,23px);line-height:1.75;padding:19px;overflow:auto;font-weight:650}
 .reveal h2{font-size:32px}.answer{font-size:22px;line-height:1.45}.reveal-inner{justify-content:flex-start;padding-top:8vh;overflow:auto}
-.photo-field{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.photo-preview{width:86px;height:64px;object-fit:cover;border-radius:10px;border:1px solid #d8dee8;display:none}.photo-preview.show{display:block}
+.photo-field{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.photo-preview{width:86px;height:64px;object-fit:contain;border-radius:10px;border:1px solid #d8dee8;display:none}.photo-preview.show{display:block}
 .photo-help{font-size:9px;color:#667085;margin-top:4px}
 @media(max-height:680px){.quiz-photo{max-height:135px}.question{min-height:86px}.option{min-height:62px}.option .txt{font-size:19px}.explain{font-size:17px;min-height:120px}}
 </style>
@@ -81,9 +81,17 @@ function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function readEditor(){document.querySelectorAll('.editor-card').forEach(card=>{const i=+card.dataset.index;questions[i].question=card.querySelector('[data-k="question"]').value.trim();questions[i].explanation=card.querySelector('[data-k="explanation"]').value.trim();questions[i].answer=card.querySelector('[data-k="answer"]').value;questions[i].ttsLang=card.querySelector('[data-k="ttsLang"]').value;['A','B','C','D'].forEach(k=>questions[i].options[k]=card.querySelector(`[data-opt="${k}"]`).value.trim())})}
 function loadVoices(){if(!('speechSynthesis'in window)){state.voices=[];return}const all=speechSynthesis.getVoices();state.voices=all;state.voice=pickVoice('hi-IN')}
 function pickVoice(lang='hi-IN'){const exact=state.voices.filter(v=>String(v.lang).toLowerCase().startsWith(lang.toLowerCase().split('-')[0]));const pool=exact.length?exact:state.voices;return pool.find(v=>/female|woman|zira|neerja|kalpana|raveena|heera|swara|aditi|priya|veena/i.test(v.name+' '+v.voiceURI))||pool[0]||null}
+
+function detectTTSLanguage(text){
+  const s=String(text||'');
+  const sanskritMarkers=['ः','॥','अहम्','त्वम्','किम्','कः','यः','तत्','एषः','एषा','भवति','भवन्ति','अस्ति','करोति','गच्छति','पठति','नमः','शिवः','रामः','कृष्णः','देवः','संस्कृत'];
+  if(sanskritMarkers.some(x=>s.includes(x)) || /[ः॥]/u.test(s)) return 'sa-IN';
+  if(/(?:स्य|स्याः|ेभ्यः|ेभ्यस्|ेषु|ेण)/u.test(s)) return 'sa-IN';
+  return 'hi-IN';
+}
 function speech(text,lang,done){if(state.muted||!('speechSynthesis'in window)){done?.();return}const id=++state.speechId;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(text).replace(/\s+/g,' ').trim());const voice=pickVoice(lang||'hi-IN');if(voice)u.voice=voice;u.lang=lang||voice?.lang||'hi-IN';u.rate=u.lang.startsWith('sa')?.78:.92;u.pitch=1.08;u.volume=1;u.onstart=()=>{$('ttsStatus').textContent='🔊 आवाज़ चल रही है…'};u.onend=()=>{if(id===state.speechId)done?.()};u.onerror=()=>{if(id===state.speechId)done?.()};speechSynthesis.speak(u)}
 if('speechSynthesis'in window){speechSynthesis.onvoiceschanged=loadVoices;loadVoices()}
-function sequence(items,done,lang='hi-IN'){if(state.muted||!('speechSynthesis'in window)){done?.();return}const id=++state.speechId;speechSynthesis.cancel();let n=0;function next(){if(id!==state.speechId)return;if(n>=items.length){done?.();return}$('ttsStatus').textContent=`🔊 ${n+1}/${items.length} पढ़ा जा रहा है…`;const u=new SpeechSynthesisUtterance(String(items[n++]).replace(/\s+/g,' ').trim());const voice=pickVoice(lang);if(voice)u.voice=voice;u.lang=lang||voice?.lang||'hi-IN';u.rate=lang==='sa-IN'?.78:.92;u.pitch=1.08;u.volume=1;u.onend=next;u.onerror=next;speechSynthesis.speak(u)}next()}
+function sequence(items,done,lang='auto'){if(state.muted||!('speechSynthesis'in window)){done?.();return}const id=++state.speechId;speechSynthesis.cancel();let n=0;function next(){if(id!==state.speechId)return;if(n>=items.length){done?.();return}const text=String(items[n++]).replace(/\s+/g,' ').trim();$('ttsStatus').textContent=`🔊 ${n}/${items.length} पढ़ा जा रहा है…`;const useLang=lang==='auto'?detectTTSLanguage(text):lang;const u=new SpeechSynthesisUtterance(text);const voice=pickVoice(useLang);if(voice)u.voice=voice;u.lang=useLang||voice?.lang||'hi-IN';u.rate=useLang==='sa-IN'?.78:.92;u.pitch=1.08;u.volume=1;u.onend=next;u.onerror=next;speechSynthesis.speak(u)}next()}
 function timerTickVoice(n,lang='hi-IN'){if(state.muted||!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(n));const voice=pickVoice(lang);if(voice)u.voice=voice;u.lang=lang||voice?.lang||'hi-IN';u.rate=1.05;u.pitch=1.12;u.volume=1;speechSynthesis.speak(u)}
 function renderQuestion(){stopAll();const q=questions[state.i];state.selected=null;state.remaining=TIMER_SECONDS;$('currentQuestion').textContent=state.i+1;$('totalQuestions').textContent=questions.length;$('progressBar').style.width=`${(state.i/questions.length)*100}%`;$('questionText').textContent=q.question;const photo=$('quizPhoto');if(q.photo){photo.src=q.photo;photo.style.display='block'}else{photo.removeAttribute('src');photo.style.display='none'}$('timerOverlay').classList.remove('show','danger');$('timerValue').textContent=TIMER_SECONDS;$('answers').innerHTML='';['A','B','C','D'].forEach(k=>{const b=document.createElement('button');b.className='option';b.type='button';b.innerHTML=`<span class="key">${k}</span><span class="txt">${esc(q.options[k])}</span>`;b.onclick=()=>selectAnswer(k);$('answers').appendChild(b)});show($('quizScreen'));$('ttsStatus').textContent='🔊 प्रश्न और विकल्प सुनिए…';const lang=q.ttsLang||'hi-IN';sequence([`प्रश्न ${state.i+1}। ${q.question}`,`विकल्प A। ${q.options.A}`,`विकल्प B। ${q.options.B}`,`विकल्प C। ${q.options.C}`,`विकल्प D। ${q.options.D}`],()=>startTimer(),lang)}
 function selectAnswer(k){if(state.timer===null)return;state.selected=k;document.querySelectorAll('.option').forEach(b=>{b.classList.toggle('selected',b.querySelector('.key').textContent===k)})}
