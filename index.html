@@ -5,2308 +5,310 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1877f2">
 <title>Anjali Awasthi Facebook Quiz</title>
-
 <style>
-:root{
-  --fb:#1877f2;
-  --fb2:#0866ff;
-  --pink:#ff4f9a;
-  --gold:#ffd166;
-  --green:#25d366;
-  --red:#ff4d67;
-  --ink:#0d1424;
-  --muted:#6b7280;
-  --white:#fff;
-  --glass:rgba(255,255,255,.94);
-  --shadow:0 22px 70px rgba(0,0,0,.20)
-}
-
+:root{--fb:#1877f2;--pink:#ff4f9a;--gold:#ffd166;--green:#25d366;--red:#ff4d67;--ink:#0d1424;--shadow:0 22px 70px rgba(0,0,0,.20)}
 *{box-sizing:border-box}
-
-html,body{
-  margin:0;
-  min-height:100%;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,
-  "Segoe UI","Noto Sans Devanagari","Nirmala UI",sans-serif;
-  background:#eef3f8;
-  color:var(--ink)
-}
-
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-
-.app{
-  min-height:100dvh;
-  display:grid;
-  place-items:center;
-  padding:10px
-}
-
-.frame{
-  width:min(100%,430px);
-  height:min(calc(100dvh - 20px),764px);
-  aspect-ratio:9/16;
-  position:relative;
-  overflow:hidden;
-  border-radius:28px;
-  background:#fff;
-  box-shadow:var(--shadow)
-}
-
-.screen{
-  position:absolute;
-  inset:0;
-  display:none;
-  overflow:hidden
-}
-
-.screen.active{
-  display:flex;
-  flex-direction:column;
-  animation:in .28s ease
-}
-
-@keyframes in{
-  from{opacity:0;transform:scale(.985)}
-  to{opacity:1;transform:none}
-}
+html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Devanagari","Nirmala UI",sans-serif;background:#eef3f8;color:var(--ink)}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.app{min-height:100dvh;display:grid;place-items:center;padding:10px}
+.frame{width:min(100%,430px);height:min(calc(100dvh - 20px),764px);aspect-ratio:9/16;position:relative;overflow:hidden;border-radius:28px;background:#fff;box-shadow:var(--shadow)}
+.screen{position:absolute;inset:0;display:none;overflow:hidden}.screen.active{display:flex;flex-direction:column;animation:in .28s ease}
+@keyframes in{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
 
 /* START */
-.start{
-  background:linear-gradient(
-    160deg,
-    #071a38 0%,
-    #0d4cba 45%,
-    #1877f2 72%,
-    #7c35e8 100%
-  );
-  color:#fff;
-  padding:22px
-}
-
-.start:before,
-.start:after{
-  content:"";
-  position:absolute;
-  border-radius:50%;
-  filter:blur(3px);
-  opacity:.35
-}
-
-.start:before{
-  width:260px;
-  height:260px;
-  background:#ff4f9a;
-  right:-110px;
-  top:-90px
-}
-
-.start:after{
-  width:240px;
-  height:240px;
-  background:#00d4ff;
-  left:-120px;
-  bottom:-90px
-}
-
-.top{
-  position:relative;
-  z-index:1;
-  display:flex;
-  justify-content:space-between;
-  align-items:center
-}
-
-.badge{
-  padding:8px 12px;
-  border-radius:999px;
-  background:rgba(255,255,255,.15);
-  border:1px solid rgba(255,255,255,.25);
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.5px
-}
-
-.hero{
-  position:relative;
-  z-index:1;
-  display:flex;
-  flex:1;
-  flex-direction:column;
-  justify-content:center;
-  text-align:center
-}
-
-.fbmark{
-  width:74px;
-  height:74px;
-  border-radius:22px;
-  background:#fff;
-  color:#1877f2;
-  margin:0 auto 18px;
-  display:grid;
-  place-items:center;
-  font-weight:1000;
-  font-size:58px;
-  line-height:1;
-  box-shadow:0 14px 35px rgba(0,0,0,.22)
-}
-
-h1{
-  font-size:clamp(29px,8vw,42px);
-  line-height:1.06;
-  margin:0;
-  font-weight:950;
-  letter-spacing:-1px
-}
-
-.hero p{
-  color:rgba(255,255,255,.82);
-  font-size:14px;
-  line-height:1.5;
-  margin:14px auto 20px;
-  max-width:350px
-}
-
-.meta{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-bottom:14px
-}
-
-.meta div{
-  padding:11px 6px;
-  border-radius:15px;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.18)
-}
-
-.meta b{
-  display:block;
-  font-size:17px
-}
-
-.meta span{
-  font-size:9px;
-  color:rgba(255,255,255,.7)
-}
-
-.btn{
-  border:0;
-  border-radius:17px;
-  padding:14px 16px;
-  font-weight:950;
-  transition:.18s
-}
-
-.btn:active{
-  transform:scale(.98)
-}
-
-.primary{
-  background:linear-gradient(135deg,#fff,#dcecff);
-  color:#0755b8;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)
-}
-
-.darkbtn{
-  background:#0d1d36;
-  color:#fff
-}
-
-.outline{
-  background:rgba(255,255,255,.1);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.25)
-}
-
-.start-actions{
-  display:grid;
-  gap:9px
-}
-
-.small-note{
-  font-size:10px;
-  color:rgba(255,255,255,.62);
-  margin-top:10px;
-  text-align:center
-}
+.start{background:linear-gradient(160deg,#071a38 0%,#0d4cba 45%,#1877f2 72%,#7c35e8 100%);color:#fff;padding:22px}
+.start:before,.start:after{content:"";position:absolute;border-radius:50%;filter:blur(3px);opacity:.35}
+.start:before{width:260px;height:260px;background:#ff4f9a;right:-110px;top:-90px}.start:after{width:240px;height:240px;background:#00d4ff;left:-120px;bottom:-90px}
+.top{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center}
+.badge{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);font-size:11px;font-weight:900;letter-spacing:.5px}
+.hero{position:relative;z-index:1;display:flex;flex:1;flex-direction:column;justify-content:center;text-align:center}
+.fbmark{width:74px;height:74px;border-radius:22px;background:#fff;color:#1877f2;margin:0 auto 18px;display:grid;place-items:center;font-weight:1000;font-size:58px;line-height:1;box-shadow:0 14px 35px rgba(0,0,0,.22)}
+h1{font-size:clamp(29px,8vw,42px);line-height:1.06;margin:0;font-weight:950;letter-spacing:-1px}.hero p{color:rgba(255,255,255,.82);font-size:14px;line-height:1.5;margin:14px auto 20px;max-width:350px}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}.meta div{padding:11px 6px;border-radius:15px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}.meta b{display:block;font-size:17px}.meta span{font-size:9px;color:rgba(255,255,255,.7)}
+.btn{border:0;border-radius:17px;padding:14px 16px;font-weight:950;transition:.18s}.btn:active{transform:scale(.98)}.primary{background:linear-gradient(135deg,#fff,#dcecff);color:#0755b8;box-shadow:0 12px 30px rgba(0,0,0,.16)}.darkbtn{background:#0d1d36;color:#fff}.outline{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25)}.start-actions{display:grid;gap:9px}.small-note{font-size:10px;color:rgba(255,255,255,.62);margin-top:10px;text-align:center}
 
 /* EDITOR */
-.editor{
-  background:#f5f7fb;
-  padding:14px;
-  overflow:auto
-}
-
-.editor-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:10px
-}
-
-.editor-head h2{
-  font-size:19px;
-  margin:0
-}
-
-.editor-card{
-  background:#fff;
-  border:1px solid #e5e7eb;
-  border-radius:18px;
-  padding:13px;
-  margin-bottom:10px;
-  box-shadow:0 5px 18px rgba(20,35,60,.05)
-}
-
-.editor-card h3{
-  margin:0 0 9px;
-  font-size:13px;
-  color:#1877f2
-}
-
-.field{
-  margin:8px 0
-}
-
-.field label{
-  display:block;
-  font-size:10px;
-  font-weight:850;
-  color:#667085;
-  margin-bottom:4px
-}
-
-.field input,
-.field textarea,
-.field select{
-  width:100%;
-  border:1px solid #d8dee8;
-  border-radius:11px;
-  padding:9px 10px;
-  outline:none;
-  background:#fbfcfe;
-  color:#111827
-}
-
-.field textarea{
-  min-height:58px;
-  resize:vertical
-}
-
-.opt-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px
-}
-
-.editor-actions{
-  position:sticky;
-  bottom:0;
-  background:linear-gradient(
-    180deg,
-    rgba(245,247,251,0),
-    #f5f7fb 22%
-  );
-  padding:14px 0 4px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px
-}
+.editor{background:#f5f7fb;padding:14px;overflow:auto}.editor-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.editor-head h2{font-size:19px;margin:0}
+.editor-card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:13px;margin-bottom:10px;box-shadow:0 5px 18px rgba(20,35,60,.05)}.editor-card h3{margin:0 0 9px;font-size:13px;color:#1877f2}
+.field{margin:8px 0}.field label{display:block;font-size:10px;font-weight:850;color:#667085;margin-bottom:4px}.field input,.field textarea,.field select{width:100%;border:1px solid #d8dee8;border-radius:11px;padding:9px 10px;outline:none;background:#fbfcfe;color:#111827}.field textarea{min-height:58px;resize:vertical}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.editor-actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(245,247,251,0),#f5f7fb 22%);padding:14px 0 4px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.photo-field{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.photo-preview{width:86px;height:64px;object-fit:contain;border-radius:10px;border:1px solid #d8dee8;display:none}.photo-preview.show{display:block}.photo-help{font-size:9px;color:#667085;margin-top:4px}
 
 /* QUIZ */
-.quiz{
-  background:linear-gradient(
-    150deg,
-    #08162d,
-    #0b3f91 52%,
-    #1877f2
-  );
-  color:#fff;
-  padding:13px 14px 18px
-}
-
-.quiz:before{
-  content:"";
-  position:absolute;
-  width:250px;
-  height:250px;
-  border-radius:50%;
-  background:#ff4f9a;
-  opacity:.22;
-  filter:blur(45px);
-  top:-100px;
-  right:-100px
-}
-
-.qtop{
-  position:relative;
-  z-index:2;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px
-}
-
-.qcount{
-  font-weight:950;
-  font-size:14px
-}
-
-.qcount span{
-  opacity:.62
-}
-
-.tools{
-  display:flex;
-  gap:6px
-}
-
-.icon{
-  width:38px;
-  height:38px;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:12px;
-  background:rgba(255,255,255,.1);
-  color:#fff;
-  display:grid;
-  place-items:center
-}
-
-.quiz-back{
-  width:42px!important;
-  height:42px!important;
-  font-size:19px
-}
-
-.bar{
-  height:6px;
-  background:rgba(255,255,255,.13);
-  border-radius:99px;
-  margin:11px 0 0;
-  overflow:hidden
-}
-
-.bar i{
-  display:block;
-  height:100%;
-  width:0;
-  background:linear-gradient(
-    90deg,
-    #ffd166,
-    #ff4f9a
-  );
-  border-radius:99px;
-  transition:.3s
-}
-
-/* TICKER */
-.quiz-ticker{
-  position:relative;
-  z-index:3;
-  overflow:hidden;
-  margin:10px 0 0;
-  border-radius:14px;
-  background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.25);
-  height:46px;
-  display:flex;
-  align-items:center;
-  white-space:nowrap;
-  box-shadow:0 6px 18px rgba(0,0,0,.12)
-}
-
-.quiz-ticker-track{
-  display:inline-block;
-  padding-left:100%;
-  animation:tickerMove 22s linear infinite;
-  font-size:19px;
-  font-weight:900;
-  letter-spacing:.2px;
-  color:#fff;
-  line-height:1.35
-}
-
-.quiz-ticker-track span{
-  display:inline-block;
-  padding-right:100vw
-}
-
-@keyframes tickerMove{
-  from{
-    transform:translateX(0)
-  }
-  to{
-    transform:translateX(-100%)
-  }
-}
-
-.qcontent{
-  position:relative;
-  z-index:1;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-  min-height:0;
-  padding-top:11px;
-  overflow:auto;
-  scrollbar-width:none
-}
-
-.qcontent::-webkit-scrollbar{
-  display:none
-}
-
-.quiz-photo{
-  width:100%;
-  max-height:185px;
-  object-fit:contain;
-  border-radius:22px;
-  margin:0 0 10px;
-  display:none;
-  box-shadow:0 14px 34px rgba(0,0,0,.24);
-  border:2px solid rgba(255,255,255,.24)
-}
-
-.question{
-  background:rgba(255,255,255,.97);
-  color:#101828;
-  border-radius:23px;
-  padding:19px 18px;
-  box-shadow:0 12px 35px rgba(0,0,0,.14);
-  font-size:clamp(22px,6.2vw,32px);
-  font-weight:950;
-  line-height:1.3;
-  min-height:112px;
-  display:flex;
-  align-items:center;
-  overflow-wrap:anywhere;
-  word-break:break-word
-}
-
-.tts{
-  height:27px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:10px;
-  font-weight:800;
-  color:rgba(255,255,255,.72)
-}
-
-.answers{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-  flex:none;
-  margin-top:10px
-}
-
-.option{
-  min-height:76px;
-  width:100%;
-  border:1px solid rgba(255,255,255,.23);
-  border-radius:18px;
-  background:rgba(255,255,255,.1);
-  color:#fff;
-  text-align:left;
-  padding:12px 14px;
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-  overflow:hidden;
-  transition:.2s
-}
-
-.option .key{
-  flex:0 0 48px;
-  height:48px;
-  border-radius:11px;
-  background:rgba(255,255,255,.15);
-  display:grid;
-  place-items:center;
-  font-weight:1000;
-  font-size:19px
-}
-
-.option .txt{
-  font-size:clamp(20px,5.7vw,27px);
-  font-weight:850;
-  line-height:1.24;
-  overflow-wrap:anywhere;
-  word-break:break-word;
-  white-space:normal;
-  padding-top:2px
-}
-
-.option.selected{
-  background:rgba(255,209,102,.2);
-  border-color:#ffd166
-}
-
-.option.correct{
-  background:rgba(37,211,102,.24);
-  border-color:#25d366
-}
-
-.option.incorrect{
-  background:rgba(255,77,103,.23);
-  border-color:#ff4d67
-}
-
-.option:disabled{
-  cursor:default
-}
-
-.hint{
-  font-size:9px;
-  text-align:center;
-  color:rgba(255,255,255,.55);
-  padding:7px 0
-}
+.quiz{background:linear-gradient(150deg,#08162d,#0b3f91 52%,#1877f2);color:#fff;padding:13px 14px 18px}.quiz:before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;background:#ff4f9a;opacity:.22;filter:blur(45px);top:-100px;right:-100px}
+.qtop{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px}.qcount{font-weight:950;font-size:14px}.qcount span{opacity:.62}.tools{display:flex;gap:6px}.icon{width:38px;height:38px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center}.quiz-back{width:42px!important;height:42px!important;font-size:19px}
+.bar{height:6px;background:rgba(255,255,255,.13);border-radius:99px;margin:11px 0 0;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd166,#ff4f9a);border-radius:99px;transition:.3s}
+.quiz-ticker{position:relative;z-index:3;overflow:hidden;margin:10px 0 0;border-radius:14px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);height:46px;display:flex;align-items:center;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.quiz-ticker-track{display:inline-block;padding-left:100%;animation:tickerMove 22s linear infinite;font-size:19px;font-weight:900;letter-spacing:.2px;color:#fff;line-height:1.35}.quiz-ticker-track span{display:inline-block;padding-right:100vw}
+@keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.qcontent{position:relative;z-index:1;display:flex;flex-direction:column;flex:1;min-height:0;padding-top:11px;overflow:auto;scrollbar-width:none}.qcontent::-webkit-scrollbar{display:none}
+.quiz-photo{width:100%;max-height:185px;object-fit:contain;border-radius:22px;margin:0 0 10px;display:none;box-shadow:0 14px 34px rgba(0,0,0,.24);border:2px solid rgba(255,255,255,.24)}
+.question{background:rgba(255,255,255,.97);color:#101828;border-radius:23px;padding:19px 18px;box-shadow:0 12px 35px rgba(0,0,0,.14);font-size:clamp(22px,6.2vw,32px);font-weight:950;line-height:1.3;min-height:112px;display:flex;align-items:center;overflow-wrap:anywhere;word-break:break-word}
+.tts{height:27px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:rgba(255,255,255,.72)}
+.answers{display:grid;grid-template-columns:1fr;gap:10px;flex:none;margin-top:10px}.option{min-height:76px;width:100%;border:1px solid rgba(255,255,255,.23);border-radius:18px;background:rgba(255,255,255,.1);color:#fff;text-align:left;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;overflow:hidden;transition:.2s}.option .key{flex:0 0 48px;height:48px;border-radius:11px;background:rgba(255,255,255,.15);display:grid;place-items:center;font-weight:1000;font-size:19px}.option .txt{font-size:clamp(20px,5.7vw,27px);font-weight:850;line-height:1.24;overflow-wrap:anywhere;word-break:break-word;white-space:normal;padding-top:2px}.option.selected{background:rgba(255,209,102,.2);border-color:#ffd166}.option.correct{background:rgba(37,211,102,.24);border-color:#25d366}.option.incorrect{background:rgba(255,77,103,.23);border-color:#ff4d67}.option:disabled{cursor:default}.hint{font-size:9px;text-align:center;color:rgba(255,255,255,.55);padding:7px 0}
 
 /* TIMER */
-.timer-overlay{
-  position:absolute;
-  inset:0;
-  display:none;
-  z-index:20;
-  background:rgba(2,10,27,.58);
-  backdrop-filter:blur(5px);
-  align-items:center;
-  justify-content:center;
-  pointer-events:none
-}
-
-.timer-overlay.show{
-  display:flex
-}
-
-.timer-ring{
-  width:154px;
-  height:154px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  position:relative;
-  background:radial-gradient(
-    circle,
-    #0a2858 55%,
-    rgba(24,119,242,.45) 56%,
-    rgba(24,119,242,.08) 70%
-  );
-  border:5px solid rgba(255,255,255,.28);
-  box-shadow:
-    0 0 0 12px rgba(255,255,255,.06),
-    0 0 55px rgba(255,209,102,.35);
-  animation:timerPulse 1s infinite
-}
-
-.timer-ring:before{
-  content:"";
-  position:absolute;
-  inset:-8px;
-  border-radius:50%;
-  border:3px solid #ffd166;
-  border-top-color:transparent;
-  animation:spin 1s linear infinite
-}
-
-.timer-number{
-  font-size:74px;
-  font-weight:1000;
-  line-height:1;
-  color:#fff;
-  text-shadow:0 4px 22px rgba(0,0,0,.35)
-}
-
-.timer-caption{
-  position:absolute;
-  bottom:29%;
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:.8px;
-  color:#ffd166;
-  text-transform:uppercase
-}
-
-@keyframes timerPulse{
-  50%{transform:scale(1.035)}
-}
-
-@keyframes spin{
-  to{transform:rotate(360deg)}
-}
-
-.timer-overlay.danger .timer-ring{
-  border-color:#ff4d67;
-  box-shadow:
-    0 0 0 12px rgba(255,77,103,.1),
-    0 0 60px rgba(255,77,103,.5)
-}
-
-.timer-overlay.danger .timer-number{
-  color:#ffd7dd
-}
+.timer-overlay{position:absolute;inset:0;display:none;z-index:20;background:rgba(2,10,27,.58);backdrop-filter:blur(5px);align-items:center;justify-content:center;pointer-events:none}.timer-overlay.show{display:flex}
+.timer-ring{width:154px;height:154px;border-radius:50%;display:grid;place-items:center;position:relative;background:radial-gradient(circle,#0a2858 55%,rgba(24,119,242,.45) 56%,rgba(24,119,242,.08) 70%);border:5px solid rgba(255,255,255,.28);box-shadow:0 0 0 12px rgba(255,255,255,.06),0 0 55px rgba(255,209,102,.35);animation:timerPulse 1s infinite}.timer-ring:before{content:"";position:absolute;inset:-8px;border-radius:50%;border:3px solid #ffd166;border-top-color:transparent;animation:spin 1s linear infinite}.timer-number{font-size:74px;font-weight:1000;line-height:1;color:#fff;text-shadow:0 4px 22px rgba(0,0,0,.35)}.timer-caption{position:absolute;bottom:29%;font-size:10px;font-weight:900;letter-spacing:.8px;color:#ffd166;text-transform:uppercase}
+@keyframes timerPulse{50%{transform:scale(1.035)}}@keyframes spin{to{transform:rotate(360deg)}}.timer-overlay.danger .timer-ring{border-color:#ff4d67;box-shadow:0 0 0 12px rgba(255,77,103,.1),0 0 60px rgba(255,77,103,.5)}.timer-overlay.danger .timer-number{color:#ffd7dd}
 
 /* REVEAL */
-.reveal{
-  background:linear-gradient(
-    155deg,
-    #071a31,
-    #0b7a58 58%,
-    #25d366
-  );
-  color:#fff;
-  padding:18px
-}
-
-.reveal-inner{
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:center;
-  flex:1;
-  text-align:center;
-  padding-top:8vh;
-  overflow:auto
-}
-
-.check{
-  width:82px;
-  height:82px;
-  border-radius:26px;
-  background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.3);
-  display:grid;
-  place-items:center;
-  font-size:42px;
-  box-shadow:0 16px 35px rgba(0,0,0,.2)
-}
-
-.reveal h2{
-  font-size:32px;
-  margin:15px 0 4px
-}
-
-.answer{
-  font-size:22px;
-  font-weight:950;
-  line-height:1.45;
-  color:#ffd166
-}
-
-.explain{
-  width:100%;
-  max-height:none;
-  min-height:150px;
-  overflow:auto;
-  margin-top:15px;
-  padding:19px;
-  border-radius:18px;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.2);
-  text-align:left;
-  font-size:clamp(18px,5vw,23px);
-  line-height:1.75;
-  font-weight:650
-}
-
-.reveal-timer{
-  margin-top:12px;
-  font-size:11px;
-  color:rgba(255,255,255,.7)
-}
-
-.reveal-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  width:100%;
-  margin-top:10px
-}
-
-.reveal .btn{
-  background:rgba(255,255,255,.13);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.2)
-}
+.reveal{background:linear-gradient(155deg,#071a31,#0b7a58 58%,#25d366);color:#fff;padding:18px}.reveal-inner{display:flex;flex-direction:column;justify-content:flex-start;align-items:center;flex:1;text-align:center;padding-top:8vh;overflow:auto}.check{width:82px;height:82px;border-radius:26px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:42px;box-shadow:0 16px 35px rgba(0,0,0,.2)}.reveal h2{font-size:32px;margin:15px 0 4px}.answer{font-size:22px;font-weight:950;line-height:1.45;color:#ffd166}.explain{width:100%;max-height:none;min-height:150px;overflow:auto;margin-top:15px;padding:19px;border-radius:18px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);text-align:left;font-size:clamp(18px,5vw,23px);line-height:1.75;font-weight:650}.reveal-timer{margin-top:12px;font-size:11px;color:rgba(255,255,255,.7)}.reveal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:10px}.reveal .btn{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.2)}
 
 /* RESULT */
-.result{
-  background:linear-gradient(
-    155deg,
-    #071a38,
-    #5a20a5 60%,
-    #ff4f9a
-  );
-  color:#fff;
-  padding:20px;
-  text-align:center
-}
+.result{background:linear-gradient(155deg,#071a38,#5a20a5 60%,#ff4f9a);color:#fff;padding:20px;text-align:center}.result-inner{display:flex;flex-direction:column;justify-content:center;flex:1}.trophy{font-size:66px}.score{font-size:58px;font-weight:1000;line-height:1}.result h2{font-size:27px;margin:10px 0 4px}.result p{color:rgba(255,255,255,.75)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.stats div{padding:12px 5px;border-radius:15px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.17)}.stats b{display:block;font-size:20px}.stats span{font-size:9px;color:rgba(255,255,255,.65)}
 
-.result-inner{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  flex:1
-}
-
-.trophy{
-  font-size:66px
-}
-
-.score{
-  font-size:58px;
-  font-weight:1000;
-  line-height:1
-}
-
-.result h2{
-  font-size:27px;
-  margin:10px 0 4px
-}
-
-.result p{
-  color:rgba(255,255,255,.75)
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin:18px 0
-}
-
-.stats div{
-  padding:12px 5px;
-  border-radius:15px;
-  background:rgba(255,255,255,.11);
-  border:1px solid rgba(255,255,255,.17)
-}
-
-.stats b{
-  display:block;
-  font-size:20px
-}
-
-.stats span{
-  font-size:9px;
-  color:rgba(255,255,255,.65)
-}
-
-/* EDITOR PHOTO */
-.photo-field{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:8px;
-  align-items:end
-}
-
-.photo-preview{
-  width:86px;
-  height:64px;
-  object-fit:contain;
-  border-radius:10px;
-  border:1px solid #d8dee8;
-  display:none
-}
-
-.photo-preview.show{
-  display:block
-}
-
-.photo-help{
-  font-size:9px;
-  color:#667085;
-  margin-top:4px
-}
-
-@media(max-height:680px){
-
-  .frame{
-    height:calc(100dvh - 10px);
-    border-radius:20px
-  }
-
-  .quiz-photo{
-    max-height:135px
-  }
-
-  .question{
-    min-height:86px
-  }
-
-  .option{
-    min-height:62px
-  }
-
-  .option .txt{
-    font-size:19px
-  }
-
-  .explain{
-    font-size:17px;
-    min-height:120px
-  }
-
-  .timer-ring{
-    width:132px;
-    height:132px
-  }
-
-  .timer-number{
-    font-size:62px
-  }
-
-  .quiz-ticker{
-    height:42px
-  }
-
-  .quiz-ticker-track{
-    font-size:17px
-  }
-}
+@media(max-height:680px){.frame{height:calc(100dvh - 10px);border-radius:20px}.quiz-photo{max-height:135px}.question{min-height:86px}.option{min-height:62px}.option .txt{font-size:19px}.explain{font-size:17px;min-height:120px}.timer-ring{width:132px;height:132px}.timer-number{font-size:62px}.quiz-ticker{height:42px}.quiz-ticker-track{font-size:17px}}
 </style>
 </head>
-
 <body>
+<div class="app"><main class="frame">
 
-<div class="app">
-<main class="frame">
-
-<!-- START -->
 <section id="startScreen" class="screen start active">
-
-<div class="top">
-<div class="badge">ANJALI AWASTHI</div>
-<div class="badge">9:16 • FACEBOOK</div>
-</div>
-
-<div class="hero">
-
-<div class="fbmark">f</div>
-
-<h1>
-Anjali Awasthi<br>
-Facebook Quiz
-</h1>
-
-<p>
-पहले प्रश्न और सभी विकल्प आवाज़ में सुनें,
-फिर बीच स्क्रीन पर 5 सेकंड का countdown देखें
-और सही उत्तर की व्याख्या सुनें।
-</p>
-
-<div class="meta">
-
-<div>
-<b id="startTotal">10</b>
-<span>QUESTIONS</span>
-</div>
-
-<div>
-<b>5s</b>
-<span>TIMER</span>
-</div>
-
-<div>
-<b>🔊</b>
-<span>VOICE</span>
-</div>
-
-</div>
-
-<div class="start-actions">
-
-<button id="editBtn" class="btn outline">
-✏️ प्रश्न / उत्तर चुनें
-</button>
-
-<button id="startBtn" class="btn primary">
-▶ QUIZ शुरू करें
-</button>
-
-</div>
-
-<div class="small-note">
-आप प्रश्न, A/B/C/D, सही उत्तर और व्याख्या खुद बदल सकती हैं।
-</div>
-
-</div>
+  <div class="top"><div class="badge">ANJALI AWASTHI</div><div class="badge">9:16 • FACEBOOK</div></div>
+  <div class="hero">
+    <div class="fbmark">f</div>
+    <h1>Anjali Awasthi<br>Facebook Quiz</h1>
+    <p>पहले प्रश्न और सभी विकल्प आवाज़ में सुनें, फिर बीच स्क्रीन पर 5 सेकंड का countdown देखें और सही उत्तर की व्याख्या सुनें।</p>
+    <div class="meta">
+      <div><b id="startTotal">10</b><span>QUESTIONS</span></div>
+      <div><b>5s</b><span>TIMER</span></div>
+      <div><b>🔊</b><span>VOICE</span></div>
+    </div>
+    <div class="start-actions">
+      <button id="editBtn" class="btn outline">✏️ प्रश्न / उत्तर चुनें</button>
+      <button id="startBtn" class="btn primary">▶ QUIZ शुरू करें</button>
+    </div>
+    <div class="small-note">आप प्रश्न, A/B/C/D, सही उत्तर और व्याख्या खुद बदल सकती हैं।</div>
+  </div>
 </section>
 
-
-<!-- EDITOR -->
 <section id="editorScreen" class="screen editor">
-
-<div class="editor-head">
-
-<h2>📝 Quiz Question Bank</h2>
-
-<button
-id="editorBack"
-class="btn"
-style="padding:8px 11px;background:#e8eef7;color:#1877f2">
-← वापस
-</button>
-
-</div>
-
-<div id="editorList"></div>
-
-<div class="editor-actions">
-
-<button id="saveEditor" class="btn primary">
-✓ Save & Use Quiz
-</button>
-
-<button id="resetEditor" class="btn darkbtn">
-↺ Demo Questions
-</button>
-
-</div>
-
+  <div class="editor-head"><h2>📝 Quiz Question Bank</h2><button id="editorBack" class="btn" style="padding:8px 11px;background:#e8eef7;color:#1877f2">← वापस</button></div>
+  <div id="editorList"></div>
+  <div class="editor-actions"><button id="saveEditor" class="btn primary">✓ Save & Use Quiz</button><button id="resetEditor" class="btn darkbtn">↺ Demo Questions</button></div>
 </section>
 
-
-<!-- QUIZ -->
 <section id="quizScreen" class="screen quiz">
-
-<div class="qtop">
-
-<div style="display:flex;align-items:center;gap:8px">
-
-<button
-id="quizBackBtn"
-class="icon quiz-back"
-title="Quiz से वापस">
-←
-</button>
-
-<div class="qcount">
-Question
-<span id="currentQuestion">1</span>
-/
-<span id="totalQuestions">10</span>
-</div>
-
-</div>
-
-<div class="tools">
-
-<button
-id="replayBtn"
-class="icon"
-title="Replay">
-🔊
-</button>
-
-<button
-id="muteBtn"
-class="icon"
-title="Mute">
-🔈
-</button>
-
-</div>
-
-</div>
-
-<div class="bar">
-<i id="progressBar"></i>
-</div>
-
-
-<!-- LARGE TICKER -->
-<div
-class="quiz-ticker"
-aria-label="स्वागत संदेश">
-
-<div class="quiz-ticker-track">
-
-<span>
-अंजली अवस्थी फेसबुक प्रोफाइल पर आपका हार्दिक स्वागत है।
-आइए, आज कुछ धार्मिक प्रश्नों पर विचार करें।
-</span>
-
-</div>
-
-</div>
-
-
-<div class="qcontent">
-
-<img
-id="quizPhoto"
-class="quiz-photo"
-alt="Quiz photo">
-
-<div id="questionText" class="question">
-प्रश्न…
-</div>
-
-<div id="ttsStatus" class="tts">
-🎙️ TTS तैयार हो रहा है…
-</div>
-
-<div id="answers" class="answers"></div>
-
-<div class="hint">
-पहले TTS • फिर 5 सेकंड countdown • फिर उत्तर और व्याख्या
-</div>
-
-</div>
-
-
-<!-- CENTRAL TIMER -->
-<div id="timerOverlay" class="timer-overlay">
-
-<div class="timer-ring">
-
-<div id="timerValue" class="timer-number">
-5
-</div>
-
-<div class="timer-caption">
-उत्तर चुनें
-</div>
-
-</div>
-
-</div>
-
+  <div class="qtop">
+    <div style="display:flex;align-items:center;gap:8px"><button id="quizBackBtn" class="icon quiz-back" title="Quiz से वापस">←</button><div class="qcount">Question <span id="currentQuestion">1</span> / <span id="totalQuestions">10</span></div></div>
+    <div class="tools"><button id="replayBtn" class="icon" title="Replay">🔊</button><button id="muteBtn" class="icon" title="Mute">🔈</button></div>
+  </div>
+  <div class="bar"><i id="progressBar"></i></div>
+  <div class="quiz-ticker" aria-label="स्वागत संदेश"><div class="quiz-ticker-track"><span>अंजली अवस्थी फेसबुक प्रोफाइल पर आपका हार्दिक स्वागत है। आइए, आज कुछ धार्मिक प्रश्नों पर विचार करें।</span></div></div>
+  <div class="qcontent"><img id="quizPhoto" class="quiz-photo" alt="Quiz photo"><div id="questionText" class="question">प्रश्न…</div><div id="ttsStatus" class="tts">🎙️ TTS तैयार हो रहा है…</div><div id="answers" class="answers"></div><div class="hint">पहले TTS • फिर 5 सेकंड countdown • फिर उत्तर और व्याख्या</div></div>
+  <div id="timerOverlay" class="timer-overlay"><div class="timer-ring"><div id="timerValue" class="timer-number">5</div><div class="timer-caption">उत्तर चुनें</div></div></div>
 </section>
 
-
-<!-- REVEAL -->
 <section id="revealScreen" class="screen reveal">
-
-<div class="top">
-
-<div class="badge">
-ANSWER REVEAL
-</div>
-
-<div class="badge">
-व्याख्या
-</div>
-
-</div>
-
-<div class="reveal-inner">
-
-<div class="check">
-✓
-</div>
-
-<h2>
-सही उत्तर
-</h2>
-
-<div id="revealAnswer" class="answer">
-—
-</div>
-
-<div id="revealExplanation" class="explain">
-व्याख्या…
-</div>
-
-<div id="nextCountdown" class="reveal-timer">
-🔊 उत्तर और पूरी व्याख्या सुनिए…
-</div>
-
-<div class="reveal-actions">
-
-<button id="replayRevealBtn" class="btn">
-🔊 फिर सुनें
-</button>
-
-<button id="nextBtn" class="btn">
-अगला →
-</button>
-
-</div>
-
-</div>
-
+  <div class="top"><div class="badge">ANSWER REVEAL</div><div class="badge">व्याख्या</div></div>
+  <div class="reveal-inner">
+    <div class="check">✓</div><h2>सही उत्तर</h2><div id="revealAnswer" class="answer">—</div><div id="revealExplanation" class="explain">व्याख्या…</div>
+    <div id="nextCountdown" class="reveal-timer">🔊 उत्तर और पूरी व्याख्या सुनिए…</div>
+    <div class="reveal-actions"><button id="replayRevealBtn" class="btn">🔊 फिर सुनें</button><button id="nextBtn" class="btn">अगला →</button></div>
+  </div>
 </section>
 
-
-<!-- RESULT -->
 <section id="resultScreen" class="screen result">
-
-<div class="result-inner">
-
-<div class="trophy">
-🏆
-</div>
-
-<div id="resultScore" class="score">
-0/10
-</div>
-
-<h2>
-Quiz पूरा हुआ!
-</h2>
-
-<p id="resultSubtitle">
-आपका परिणाम तैयार है।
-</p>
-
-<div class="stats">
-
-<div>
-<b id="correctCount">0</b>
-<span>सही</span>
-</div>
-
-<div>
-<b id="wrongCount">0</b>
-<span>गलत</span>
-</div>
-
-<div>
-<b id="percentCount">0%</b>
-<span>स्कोर</span>
-</div>
-
-</div>
-
-<button
-id="restartBtn"
-class="btn primary">
-↻ फिर से खेलें
-</button>
-
-</div>
-
+  <div class="result-inner"><div class="trophy">🏆</div><div id="resultScore" class="score">0/10</div><h2>Quiz पूरा हुआ!</h2><p id="resultSubtitle">आपका परिणाम तैयार है।</p>
+    <div class="stats"><div><b id="correctCount">0</b><span>सही</span></div><div><b id="wrongCount">0</b><span>गलत</span></div><div><b id="percentCount">0%</b><span>स्कोर</span></div></div>
+    <button id="restartBtn" class="btn primary">↻ फिर से खेलें</button>
+  </div>
 </section>
 
-</main>
-</div>
-
+</main></div>
 
 <script>
+'use strict';
 
-const TIMER_SECONDS=5;
-const REVEAL_SECONDS=5;
+const TIMER_SECONDS = 5;
 
-const defaultQuestions=[
-
-{
-question:"भारत की राजधानी क्या है?",
-options:{
-A:"मुंबई",
-B:"नई दिल्ली",
-C:"कोलकाता",
-D:"चेन्नई"
-},
-answer:"B",
-explanation:"भारत की राजधानी नई दिल्ली है। यह केंद्र सरकार, संसद और प्रमुख राष्ट्रीय संस्थानों का प्रशासनिक केंद्र है।"
-},
-
-{
-question:"भारत का राष्ट्रीय पशु कौन सा है?",
-options:{
-A:"सिंह",
-B:"हाथी",
-C:"बाघ",
-D:"मोर"
-},
-answer:"C",
-explanation:"बाघ भारत का राष्ट्रीय पशु है। यह शक्ति, साहस और वन्य जैव विविधता का महत्वपूर्ण प्रतीक है।"
-},
-
-{
-question:"भारत का राष्ट्रीय फूल कौन सा है?",
-options:{
-A:"गुलाब",
-B:"कमल",
-C:"चमेली",
-D:"गेंदा"
-},
-answer:"B",
-explanation:"कमल भारत का राष्ट्रीय फूल है और भारतीय संस्कृति में पवित्रता तथा सुंदरता से जुड़ा महत्वपूर्ण प्रतीक है।"
-},
-
-{
-question:"पृथ्वी का एकमात्र प्राकृतिक उपग्रह कौन सा है?",
-options:{
-A:"सूर्य",
-B:"मंगल",
-C:"चंद्रमा",
-D:"शुक्र"
-},
-answer:"C",
-explanation:"चंद्रमा पृथ्वी का एकमात्र प्राकृतिक उपग्रह है और वह पृथ्वी की परिक्रमा करता है।"
-},
-
-{
-question:"भारत का राष्ट्रीय ध्वज किस आकार का है?",
-options:{
-A:"वर्गाकार",
-B:"आयताकार",
-C:"त्रिभुजाकार",
-D:"वृत्ताकार"
-},
-answer:"B",
-explanation:"भारत का राष्ट्रीय ध्वज आयताकार होता है और इसमें तीन क्षैतिज पट्टियां तथा बीच में अशोक चक्र होता है।"
-},
-
-{
-question:"जल का रासायनिक सूत्र क्या है?",
-options:{
-A:"CO₂",
-B:"O₂",
-C:"H₂O",
-D:"NaCl"
-},
-answer:"C",
-explanation:"जल का रासायनिक सूत्र H₂O है। एक अणु में दो हाइड्रोजन और एक ऑक्सीजन परमाणु होते हैं।"
-},
-
-{
-question:"सूर्य के सबसे निकट कौन सा ग्रह है?",
-options:{
-A:"शुक्र",
-B:"पृथ्वी",
-C:"बुध",
-D:"मंगल"
-},
-answer:"C",
-explanation:"बुध सूर्य के सबसे निकट स्थित ग्रह है और सौरमंडल का सबसे छोटा ग्रह भी है।"
-},
-
-{
-question:"भारत में संविधान दिवस कब मनाया जाता है?",
-options:{
-A:"15 अगस्त",
-B:"26 जनवरी",
-C:"2 अक्टूबर",
-D:"26 नवंबर"
-},
-answer:"D",
-explanation:"भारत में संविधान दिवस 26 नवंबर को मनाया जाता है। इसी दिन 1949 में संविधान सभा ने संविधान को अंगीकृत किया था।"
-},
-
-{
-question:"कंप्यूटर का मुख्य प्रसंस्करण भाग किस नाम से जाना जाता है?",
-options:{
-A:"CPU",
-B:"USB",
-C:"PDF",
-D:"HTML"
-},
-answer:"A",
-explanation:"CPU का अर्थ Central Processing Unit है। यह निर्देशों को संसाधित करने और गणनाएं करने का मुख्य भाग है।"
-},
-
-{
-question:"भारत का राष्ट्रीय पक्षी कौन सा है?",
-options:{
-A:"तोता",
-B:"मोर",
-C:"कोयल",
-D:"हंस"
-},
-answer:"B",
-explanation:"मोर भारत का राष्ट्रीय पक्षी है और भारतीय प्राकृतिक तथा सांस्कृतिक पहचान का महत्वपूर्ण प्रतीक है।"
-}
-
+const defaultQuestions = [
+  {question:"भारत की राजधानी क्या है?",options:{A:"मुंबई",B:"नई दिल्ली",C:"कोलकाता",D:"चेन्नई"},answer:"B",explanation:"भारत की राजधानी नई दिल्ली है। यह केंद्र सरकार, संसद और प्रमुख राष्ट्रीय संस्थानों का प्रशासनिक केंद्र है।"},
+  {question:"भारत का राष्ट्रीय पशु कौन सा है?",options:{A:"सिंह",B:"हाथी",C:"बाघ",D:"मोर"},answer:"C",explanation:"बाघ भारत का राष्ट्रीय पशु है। यह शक्ति, साहस और वन्य जैव विविधता का महत्वपूर्ण प्रतीक है।"},
+  {question:"भारत का राष्ट्रीय फूल कौन सा है?",options:{A:"गुलाब",B:"कमल",C:"चमेली",D:"गेंदा"},answer:"B",explanation:"कमल भारत का राष्ट्रीय फूल है और भारतीय संस्कृति में पवित्रता तथा सुंदरता से जुड़ा महत्वपूर्ण प्रतीक है।"},
+  {question:"पृथ्वी का एकमात्र प्राकृतिक उपग्रह कौन सा है?",options:{A:"सूर्य",B:"मंगल",C:"चंद्रमा",D:"शुक्र"},answer:"C",explanation:"चंद्रमा पृथ्वी का एकमात्र प्राकृतिक उपग्रह है और वह पृथ्वी की परिक्रमा करता है।"},
+  {question:"भारत का राष्ट्रीय ध्वज किस आकार का है?",options:{A:"वर्गाकार",B:"आयताकार",C:"त्रिभुजाकार",D:"वृत्ताकार"},answer:"B",explanation:"भारत का राष्ट्रीय ध्वज आयताकार होता है और इसमें तीन क्षैतिज पट्टियां तथा बीच में अशोक चक्र होता है।"},
+  {question:"जल का रासायनिक सूत्र क्या है?",options:{A:"CO₂",B:"O₂",C:"H₂O",D:"NaCl"},answer:"C",explanation:"जल का रासायनिक सूत्र H₂O है। एक अणु में दो हाइड्रोजन और एक ऑक्सीजन परमाणु होते हैं।"},
+  {question:"सूर्य के सबसे निकट कौन सा ग्रह है?",options:{A:"शुक्र",B:"पृथ्वी",C:"बुध",D:"मंगल"},answer:"C",explanation:"बुध सूर्य के सबसे निकट स्थित ग्रह है और सौरमंडल का सबसे छोटा ग्रह भी है।"},
+  {question:"भारत में संविधान दिवस कब मनाया जाता है?",options:{A:"15 अगस्त",B:"26 जनवरी",C:"2 अक्टूबर",D:"26 नवंबर"},answer:"D",explanation:"भारत में संविधान दिवस 26 नवंबर को मनाया जाता है। इसी दिन 1949 में संविधान सभा ने संविधान को अंगीकृत किया था।"},
+  {question:"कंप्यूटर का मुख्य प्रसंस्करण भाग किस नाम से जाना जाता है?",options:{A:"CPU",B:"USB",C:"PDF",D:"HTML"},answer:"A",explanation:"CPU का अर्थ Central Processing Unit है। यह निर्देशों को संसाधित करने और गणनाएं करने का मुख्य भाग है।"},
+  {question:"भारत का राष्ट्रीय पक्षी कौन सा है?",options:{A:"तोता",B:"मोर",C:"कोयल",D:"हंस"},answer:"B",explanation:"मोर भारत का राष्ट्रीय पक्षी है और भारतीय प्राकृतिक तथा सांस्कृतिक पहचान का महत्वपूर्ण प्रतीक है।"}
 ];
 
-let questions=structuredClone(defaultQuestions);
+let questions = structuredClone(defaultQuestions);
+const state = {i:0,score:0,selected:null,timer:null,muted:false,voices:[],speechId:0};
+const $ = id => document.getElementById(id);
+const screens = [$('startScreen'),$('editorScreen'),$('quizScreen'),$('revealScreen'),$('resultScreen')];
 
-const state={
-i:0,
-score:0,
-selected:null,
-timer:null,
-revealTimer:null,
-remaining:5,
-revealRemaining:5,
-muted:false,
-voices:[],
-voice:null,
-speechId:0
-};
-
-const $=id=>document.getElementById(id);
-
-const screens=[
-$('startScreen'),
-$('editorScreen'),
-$('quizScreen'),
-$('revealScreen'),
-$('resultScreen')
-];
-
-function show(s){
-
-screens.forEach(x=>x.classList.remove('active'));
-
-s.classList.add('active');
-
-}
-
-function stopAll(){
-
-clearInterval(state.timer);
-
-clearInterval(state.revealTimer);
-
-state.timer=null;
-
-state.revealTimer=null;
-
-if('speechSynthesis' in window){
-
-speechSynthesis.cancel();
-
-}
-
-state.speechId++;
-
-}
-
-
-function esc(s){
-
-return String(s??'')
-.replace(/&/g,'&amp;')
-.replace(/</g,'&lt;')
-.replace(/>/g,'&gt;')
-.replace(/"/g,'&quot;');
-
-}
-
+function show(screen){screens.forEach(s=>s.classList.remove('active'));screen.classList.add('active')}
+function stopAll(){clearInterval(state.timer);state.timer=null;if('speechSynthesis' in window)speechSynthesis.cancel();state.speechId++}
+function esc(s){return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 function renderEditor(){
-
-const list=$('editorList');
-
-list.innerHTML='';
-
-questions.forEach((q,i)=>{
-
-const card=document.createElement('div');
-
-card.className='editor-card';
-
-card.innerHTML=`
-
-<h3>प्रश्न ${i+1}</h3>
-
-<div class="field">
-
-<label>प्रश्न</label>
-
-<textarea data-k="question">
-${esc(q.question)}
-</textarea>
-
-</div>
-
-<div class="opt-grid">
-
-${['A','B','C','D'].map(k=>`
-
-<div class="field">
-
-<label>विकल्प ${k}</label>
-
-<input
-data-opt="${k}"
-value="${esc(q.options[k])}">
-
-</div>
-
-`).join('')}
-
-</div>
-
-<div class="field">
-
-<label>सही उत्तर चुनें</label>
-
-<select data-k="answer">
-
-${['A','B','C','D'].map(k=>`
-
-<option
-value="${k}"
-${q.answer===k?'selected':''}>
-
-${k} — ${esc(q.options[k])}
-
-</option>
-
-`).join('')}
-
-</select>
-
-</div>
-
-<div class="field">
-
-<label>उत्तर की व्याख्या</label>
-
-<textarea data-k="explanation">
-${esc(q.explanation)}
-</textarea>
-
-</div>
-
-<div class="field">
-
-<label>TTS भाषा</label>
-
-<select data-k="ttsLang">
-
-<option
-value="hi-IN"
-${(q.ttsLang||'hi-IN')==='hi-IN'?'selected':''}>
-
-हिंदी — Hindi
-
-</option>
-
-<option
-value="sa-IN"
-${q.ttsLang==='sa-IN'?'selected':''}>
-
-संस्कृत — Sanskrit
-
-</option>
-
-</select>
-
-</div>
-
-<div class="field photo-field">
-
-<div>
-
-<label>
-प्रश्न के साथ फोटो (वैकल्पिक)
-</label>
-
-<input
-type="file"
-accept="image/*"
-data-photo>
-
-<div class="photo-help">
-Facebook-style quiz के लिए फोटो जोड़ें।
-</div>
-
-</div>
-
-<img
-class="photo-preview ${q.photo?'show':''}"
-src="${q.photo||''}"
-alt="preview">
-
-</div>
-
-`;
-
-card.dataset.index=i;
-
-list.appendChild(card);
-
-});
-
+  const list=$('editorList'); list.innerHTML='';
+  questions.forEach((q,i)=>{
+    const card=document.createElement('div'); card.className='editor-card'; card.dataset.index=i;
+    card.innerHTML=`
+      <h3>प्रश्न ${i+1}</h3>
+      <div class="field"><label>प्रश्न</label><textarea data-k="question">${esc(q.question)}</textarea></div>
+      <div class="opt-grid">${['A','B','C','D'].map(k=>`<div class="field"><label>विकल्प ${k}</label><input data-opt="${k}" value="${esc(q.options[k])}"></div>`).join('')}</div>
+      <div class="field"><label>सही उत्तर चुनें</label><select data-k="answer">${['A','B','C','D'].map(k=>`<option value="${k}" ${q.answer===k?'selected':''}>${k} — ${esc(q.options[k])}</option>`).join('')}</select></div>
+      <div class="field"><label>उत्तर की व्याख्या</label><textarea data-k="explanation">${esc(q.explanation)}</textarea></div>
+      <div class="field photo-field">
+        <div><label>प्रश्न के साथ फोटो (वैकल्पिक)</label><input type="file" accept="image/*" data-photo><div class="photo-help">फोटो पूरी दिखाई जाएगी; crop नहीं होगी।</div></div>
+        <img class="photo-preview ${q.photo?'show':''}" src="${q.photo||''}" alt="preview">
+      </div>`;
+    list.appendChild(card);
+    const fileInput=card.querySelector('[data-photo]');
+    fileInput.addEventListener('change',e=>{
+      const file=e.target.files?.[0]; if(!file)return;
+      const reader=new FileReader();
+      reader.onload=()=>{questions[i].photo=reader.result;const img=card.querySelector('.photo-preview');img.src=reader.result;img.classList.add('show')};
+      reader.readAsDataURL(file);
+    });
+  });
 }
-
 
 function readEditor(){
-
-document.querySelectorAll('.editor-card')
-.forEach(card=>{
-
-const i=+card.dataset.index;
-
-questions[i].question=
-card.querySelector('[data-k="question"]').value.trim();
-
-questions[i].explanation=
-card.querySelector('[data-k="explanation"]').value.trim();
-
-questions[i].answer=
-card.querySelector('[data-k="answer"]').value;
-
-questions[i].ttsLang=
-card.querySelector('[data-k="ttsLang"]').value;
-
-['A','B','C','D']
-.forEach(k=>
-
-questions[i].options[k]=
-card.querySelector(`[data-opt="${k}"]`).value.trim()
-
-);
-
-});
-
+  document.querySelectorAll('.editor-card').forEach(card=>{
+    const i=Number(card.dataset.index);
+    questions[i].question=card.querySelector('[data-k="question"]').value.trim();
+    questions[i].explanation=card.querySelector('[data-k="explanation"]').value.trim();
+    questions[i].answer=card.querySelector('[data-k="answer"]').value;
+    ['A','B','C','D'].forEach(k=>{questions[i].options[k]=card.querySelector(`[data-opt="${k}"]`).value.trim()});
+  });
 }
 
-
-function loadVoices(){
-
-if(!('speechSynthesis'in window)){
-
-state.voices=[];
-
-return;
-
+function loadVoices(){if(!('speechSynthesis' in window))return;state.voices=speechSynthesis.getVoices()}
+function findVoice(lang){
+  const prefix=String(lang||'hi-IN').toLowerCase().split('-')[0];
+  const exact=state.voices.filter(v=>String(v.lang).toLowerCase().startsWith(prefix));
+  const pool=exact.length?exact:state.voices;
+  const female=pool.find(v=>/female|woman|zira|neerja|kalpana|raveena|heera|swara|aditi|priya|veena|lekha/i.test(v.name+' '+v.voiceURI));
+  return female||pool[0]||null;
 }
 
-const all=speechSynthesis.getVoices();
-
-state.voices=all;
-
-state.voice=pickVoice('hi-IN');
-
+/* Heuristic text-language detection. Devanagari is shared by Hindi/Sanskrit,
+   so Sanskrit is identified through common Sanskrit markers. */
+function detectLanguage(text){
+  const s=String(text||'').trim();
+  const sanskritMarkers=[
+    'अहम्','त्वम्','किम्','कः','का','के','यः','यत्','तत्','एषः','एषा','एतत्',
+    'भवति','भवन्ति','अस्ति','करोति','गच्छति','पठति','लिखति','वदति','नमः',
+    'रामः','कृष्णः','शिवः','देवः','संस्कृत','प्रश्नोत्तर','विद्या','धर्मः',
+    '।','॥','ः'
+  ];
+  if(sanskritMarkers.some(m=>s.includes(m))) return 'sa-IN';
+  if(/(?:स्य|स्याः|ेन|ेभ्यः|ेषु|ेण|त्र|तः)/u.test(s)) return 'sa-IN';
+  return 'hi-IN';
 }
 
-
-function pickVoice(lang='hi-IN'){
-
-const exact=
-state.voices.filter(v=>
-
-String(v.lang)
-.toLowerCase()
-.startsWith(
-lang.toLowerCase().split('-')[0]
-)
-
-);
-
-const pool=exact.length?exact:state.voices;
-
-return pool.find(v=>
-
-/female|woman|zira|neerja|kalpana|raveena|heera|swara|aditi|priya|veena/i
-.test(v.name+' '+v.voiceURI)
-
-)||pool[0]||null;
-
+function speakOne(text,done){
+  if(state.muted||!('speechSynthesis' in window)){done?.();return}
+  const id=++state.speechId; speechSynthesis.cancel();
+  const lang=detectLanguage(text); const u=new SpeechSynthesisUtterance(String(text).replace(/\s+/g,' ').trim());
+  const voice=findVoice(lang); if(voice)u.voice=voice;
+  u.lang=voice?.lang||lang; u.rate=lang==='sa-IN'?0.78:0.92; u.pitch=1.08; u.volume=1;
+  u.onstart=()=>{$('ttsStatus').textContent='🔊 आवाज़ चल रही है…'};
+  u.onend=()=>{if(id===state.speechId)done?.()};
+  u.onerror=()=>{if(id===state.speechId)done?.()};
+  speechSynthesis.speak(u);
 }
 
-
-function speech(text,lang,done){
-
-if(
-state.muted ||
-!('speechSynthesis'in window)
-){
-
-done?.();
-
-return;
-
+function speakSequence(items,done){
+  if(state.muted||!('speechSynthesis' in window)){done?.();return}
+  const id=++state.speechId; speechSynthesis.cancel(); let index=0;
+  const next=()=>{
+    if(id!==state.speechId)return;
+    if(index>=items.length){done?.();return}
+    const text=String(items[index++]).replace(/\s+/g,' ').trim();
+    $('ttsStatus').textContent=`🔊 ${index}/${items.length} पढ़ा जा रहा है…`;
+    const lang=detectLanguage(text); const u=new SpeechSynthesisUtterance(text); const voice=findVoice(lang); if(voice)u.voice=voice;
+    u.lang=voice?.lang||lang; u.rate=lang==='sa-IN'?0.78:0.92; u.pitch=1.08; u.volume=1; u.onend=next; u.onerror=next; speechSynthesis.speak(u);
+  };
+  next();
 }
 
-const id=++state.speechId;
-
-speechSynthesis.cancel();
-
-const u=
-new SpeechSynthesisUtterance(
-String(text)
-.replace(/\s+/g,' ')
-.trim()
-);
-
-const voice=pickVoice(lang||'hi-IN');
-
-if(voice)u.voice=voice;
-
-u.lang=lang||voice?.lang||'hi-IN';
-
-u.rate=
-u.lang.startsWith('sa')
-?.78
-:.92;
-
-u.pitch=1.08;
-
-u.volume=1;
-
-u.onstart=()=>
-
-$('ttsStatus').textContent=
-'🔊 आवाज़ चल रही है…';
-
-u.onend=()=>
-
-if(id===state.speechId)
-done?.();
-
-u.onerror=()=>
-
-if(id===state.speechId)
-done?.();
-
-speechSynthesis.speak(u);
-
+function sayTimer(value){
+  if(state.muted||!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const text=String(value); const lang=detectLanguage(text); const u=new SpeechSynthesisUtterance(text); const voice=findVoice(lang); if(voice)u.voice=voice;
+  u.lang=voice?.lang||lang; u.rate=1.05; u.pitch=1.12; u.volume=1; speechSynthesis.speak(u);
 }
-
-
-if('speechSynthesis'in window){
-
-speechSynthesis.onvoiceschanged=loadVoices;
-
-loadVoices();
-
-}
-
-
-function sequence(items,done,lang='auto'){
-
-if(
-state.muted ||
-!('speechSynthesis'in window)
-){
-
-done?.();
-
-return;
-
-}
-
-const id=++state.speechId;
-
-speechSynthesis.cancel();
-
-let n=0;
-
-function next(){
-
-if(id!==state.speechId)return;
-
-if(n>=items.length){
-
-done?.();
-
-return;
-
-}
-
-const text=
-String(items[n++])
-.replace(/\s+/g,' ')
-.trim();
-
-$('ttsStatus').textContent=
-`🔊 ${n}/${items.length} पढ़ा जा रहा है…`;
-
-const useLang=
-lang==='auto'
-?'hi-IN'
-:lang;
-
-const u=
-new SpeechSynthesisUtterance(text);
-
-const voice=pickVoice(useLang);
-
-if(voice)u.voice=voice;
-
-u.lang=
-useLang||
-voice?.lang||
-'hi-IN';
-
-u.rate=
-useLang==='sa-IN'
-?.78
-:.92;
-
-u.pitch=1.08;
-
-u.volume=1;
-
-u.onend=next;
-
-u.onerror=next;
-
-speechSynthesis.speak(u);
-
-}
-
-next();
-
-}
-
-
-function timerTickVoice(n,lang='hi-IN'){
-
-if(
-state.muted ||
-!('speechSynthesis'in window)
-)return;
-
-speechSynthesis.cancel();
-
-const u=
-new SpeechSynthesisUtterance(
-String(n)
-);
-
-const voice=pickVoice(lang);
-
-if(voice)u.voice=voice;
-
-u.lang=
-lang||
-voice?.lang||
-'hi-IN';
-
-u.rate=1.05;
-
-u.pitch=1.12;
-
-u.volume=1;
-
-speechSynthesis.speak(u);
-
-}
-
 
 function renderQuestion(){
-
-stopAll();
-
-const q=questions[state.i];
-
-state.selected=null;
-
-state.remaining=TIMER_SECONDS;
-
-$('currentQuestion').textContent=
-state.i+1;
-
-$('totalQuestions').textContent=
-questions.length;
-
-$('progressBar').style.width=
-`${(state.i/questions.length)*100}%`;
-
-$('questionText').textContent=
-q.question;
-
-const photo=$('quizPhoto');
-
-if(q.photo){
-
-photo.src=q.photo;
-
-photo.style.display='block';
-
-}else{
-
-photo.removeAttribute('src');
-
-photo.style.display='none';
-
+  stopAll(); const q=questions[state.i]; state.selected=null;
+  $('currentQuestion').textContent=state.i+1; $('totalQuestions').textContent=questions.length; $('progressBar').style.width=`${(state.i/questions.length)*100}%`;
+  $('questionText').textContent=q.question;
+  const photo=$('quizPhoto'); if(q.photo){photo.src=q.photo;photo.style.display='block'}else{photo.removeAttribute('src');photo.style.display='none'}
+  $('timerOverlay').classList.remove('show','danger'); $('timerValue').textContent=TIMER_SECONDS; $('answers').innerHTML='';
+  ['A','B','C','D'].forEach(k=>{const b=document.createElement('button');b.className='option';b.type='button';b.innerHTML=`<span class="key">${k}</span><span class="txt">${esc(q.options[k])}</span>`;b.onclick=()=>selectAnswer(k);$('answers').appendChild(b)});
+  show($('quizScreen')); $('ttsStatus').textContent='🔊 प्रश्न और विकल्प सुनिए…';
+  speakSequence([
+    `प्रश्न ${state.i+1}। ${q.question}`,
+    `विकल्प A। ${q.options.A}`,
+    `विकल्प B। ${q.options.B}`,
+    `विकल्प C। ${q.options.C}`,
+    `विकल्प D। ${q.options.D}`
+  ],startTimer);
 }
-
-$('timerOverlay')
-.classList.remove(
-'show',
-'danger'
-);
-
-$('timerValue').textContent=
-TIMER_SECONDS;
-
-$('answers').innerHTML='';
-
-['A','B','C','D']
-.forEach(k=>{
-
-const b=
-document.createElement('button');
-
-b.className='option';
-
-b.type='button';
-
-b.innerHTML=`
-
-<span class="key">
-${k}
-</span>
-
-<span class="txt">
-${esc(q.options[k])}
-</span>
-
-`;
-
-b.onclick=()=>selectAnswer(k);
-
-$('answers').appendChild(b);
-
-});
-
-show($('quizScreen'));
-
-$('ttsStatus').textContent=
-'🔊 प्रश्न और विकल्प सुनिए…';
-
-const lang=
-q.ttsLang||'hi-IN';
-
-sequence(
-
-[
-`प्रश्न ${state.i+1}। ${q.question}`,
-`विकल्प A। ${q.options.A}`,
-`विकल्प B। ${q.options.B}`,
-`विकल्प C। ${q.options.C}`,
-`विकल्प D। ${q.options.D}`
-],
-
-()=>startTimer(),
-
-lang
-
-);
-
-}
-
 
 function selectAnswer(k){
-
-if(state.timer===null)return;
-
-state.selected=k;
-
-document
-.querySelectorAll('.option')
-.forEach(b=>{
-
-b.classList.toggle(
-'selected',
-b.querySelector('.key')
-.textContent===k
-);
-
-});
-
+  if(state.timer===null)return;
+  state.selected=k;
+  document.querySelectorAll('.option').forEach(b=>b.classList.toggle('selected',b.querySelector('.key').textContent===k));
 }
-
 
 function startTimer(){
-
-if(state.timer!==null)return;
-
-const q=questions[state.i];
-
-const lang=q.ttsLang||'hi-IN';
-
-state.remaining=TIMER_SECONDS;
-
-$('timerOverlay')
-.classList.add('show');
-
-$('timerValue').textContent=
-state.remaining;
-
-timerTickVoice(
-state.remaining,
-lang
-);
-
-state.timer=
-setInterval(()=>{
-
-state.remaining--;
-
-if(state.remaining<=0){
-
-clearInterval(state.timer);
-
-state.timer=null;
-
-$('timerValue').textContent='0';
-
-timerTickVoice(
-'समय समाप्त',
-lang
-);
-
-setTimeout(
-reveal,
-300
-);
-
-return;
-
+  if(state.timer!==null)return; state.timer=TIMER_SECONDS;
+  $('timerOverlay').classList.add('show'); $('timerValue').textContent=state.timer; sayTimer(state.timer);
+  const timerId=window.setInterval(()=>{
+    state.timer--;
+    if(state.timer<=0){clearInterval(timerId);state.timer=null;$('timerValue').textContent='0';sayTimer('समय समाप्त');window.setTimeout(reveal,260);return}
+    $('timerValue').textContent=state.timer; if(state.timer<=2)$('timerOverlay').classList.add('danger'); sayTimer(state.timer);
+  },1000);
 }
-
-$('timerValue').textContent=
-state.remaining;
-
-if(state.remaining<=2)
-
-$('timerOverlay')
-.classList.add('danger');
-
-timerTickVoice(
-state.remaining,
-lang
-);
-
-},1000);
-
-}
-
 
 function reveal(){
-
-stopAll();
-
-const q=questions[state.i];
-
-const lang=q.ttsLang||'hi-IN';
-
-document
-.querySelectorAll('.option')
-.forEach(b=>{
-
-const k=
-b.querySelector('.key')
-.textContent;
-
-b.disabled=true;
-
-if(k===q.answer)
-
-b.classList.add('correct');
-
-if(
-state.selected===k &&
-k!==q.answer
-)
-
-b.classList.add('incorrect');
-
-});
-
-if(state.selected===q.answer)
-
-state.score++;
-
-$('revealAnswer').textContent=
-`विकल्प ${q.answer} — ${q.options[q.answer]}`;
-
-$('revealExplanation').textContent=
-q.explanation;
-
-$('nextCountdown').textContent=
-'🔊 उत्तर और पूरी व्याख्या सुनिए…';
-
-$('nextBtn').disabled=true;
-
-$('nextBtn').style.opacity='.45';
-
-show($('revealScreen'));
-
-sequence(
-
-[
-`सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,
-`व्याख्या। ${q.explanation}`
-],
-
-()=>{
-
-$('nextCountdown').textContent=
-'✓ पूरी व्याख्या पढ़ी गई। अगला प्रश्न शुरू हो रहा है…';
-
-$('nextBtn').disabled=false;
-
-$('nextBtn').style.opacity='1';
-
-setTimeout(
-()=>nextQuestion(),
-80
-);
-
-},
-
-lang
-
-);
-
+  stopAll(); const q=questions[state.i];
+  document.querySelectorAll('.option').forEach(b=>{const k=b.querySelector('.key').textContent;b.disabled=true;if(k===q.answer)b.classList.add('correct');if(state.selected===k&&k!==q.answer)b.classList.add('incorrect')});
+  if(state.selected===q.answer)state.score++;
+  $('revealAnswer').textContent=`विकल्प ${q.answer} — ${q.options[q.answer]}`; $('revealExplanation').textContent=q.explanation; $('nextCountdown').textContent='🔊 उत्तर और पूरी व्याख्या सुनिए…'; $('nextBtn').disabled=true; $('nextBtn').style.opacity='.45'; show($('revealScreen'));
+  speakSequence([
+    `सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,
+    `व्याख्या। ${q.explanation}`
+  ],()=>{
+    $('nextCountdown').textContent='✓ पूरी व्याख्या पढ़ी गई। अगला प्रश्न शुरू हो रहा है…';
+    $('nextBtn').disabled=false; $('nextBtn').style.opacity='1';
+    window.setTimeout(nextQuestion,80);
+  });
 }
-
 
 function nextQuestion(){
-
-stopAll();
-
-$('nextBtn').disabled=false;
-
-$('nextBtn').style.opacity='1';
-
-if(
-state.i<
-questions.length-1
-){
-
-state.i++;
-
-renderQuestion();
-
-}else{
-
-showResult();
-
+  stopAll(); if(state.i<questions.length-1){state.i++;renderQuestion()}else showResult();
 }
-
-}
-
 
 function showResult(){
-
-const total=questions.length;
-
-const wrong=
-total-state.score;
-
-const pct=
-Math.round(
-state.score/total*100
-);
-
-$('resultScore').textContent=
-`${state.score}/${total}`;
-
-$('correctCount').textContent=
-state.score;
-
-$('wrongCount').textContent=
-wrong;
-
-$('percentCount').textContent=
-pct+'%';
-
-$('resultSubtitle').textContent=
-pct>=80
-?'शानदार! Quiz पूरा हुआ।'
-:
-pct>=50
-?'अच्छा प्रयास! फिर से खेलकर score बढ़ाएं।'
-:
-'फिर से प्रयास करें और अपना score बेहतर बनाएं।';
-
-show($('resultScreen'));
-
+  const total=questions.length,wrong=total-state.score,pct=total?Math.round(state.score/total*100):0;
+  $('resultScore').textContent=`${state.score}/${total}`; $('correctCount').textContent=state.score; $('wrongCount').textContent=wrong; $('percentCount').textContent=pct+'%';
+  $('resultSubtitle').textContent=pct>=80?'शानदार! Quiz पूरा हुआ।':pct>=50?'अच्छा प्रयास! फिर से खेलकर score बढ़ाएं।':'फिर से प्रयास करें और अपना score बेहतर बनाएं।'; show($('resultScreen'));
 }
 
-
-$('editBtn').onclick=()=>{
-
-stopAll();
-
-renderEditor();
-
-show($('editorScreen'));
-
-document
-.querySelectorAll('[data-photo]')
-.forEach(input=>
-
-input.onchange=e=>{
-
-const file=
-e.target.files?.[0];
-
-const card=
-e.target.closest('.editor-card');
-
-if(!file)return;
-
-const i=
-+card.dataset.index;
-
-const reader=
-new FileReader();
-
-reader.onload=()=>{
-
-questions[i].photo=
-reader.result;
-
-const img=
-card.querySelector('.photo-preview');
-
-img.src=
-reader.result;
-
-img.classList.add('show');
-
-};
-
-reader.readAsDataURL(file);
-
-}
-
-);
-
-};
-
-
-$('editorBack').onclick=()=>{
-
-readEditor();
-
-show($('startScreen'));
-
-};
-
-
-$('saveEditor').onclick=()=>{
-
-readEditor();
-
-$('startTotal').textContent=
-questions.length;
-
-show($('startScreen'));
-
-};
-
-
-$('resetEditor').onclick=()=>{
-
-questions=
-structuredClone(defaultQuestions);
-
-renderEditor();
-
-};
-
-
-$('startBtn').onclick=()=>{
-
-stopAll();
-
-state.i=0;
-
-state.score=0;
-
-renderQuestion();
-
-};
-
-
-$('quizBackBtn').onclick=()=>{
-
-stopAll();
-
-if(
-confirm(
-'क्या आप Quiz से बाहर निकलना चाहती हैं? वर्तमान प्रश्न की progress समाप्त हो जाएगी।'
-)
-){
-
-show($('startScreen'));
-
-}
-
-};
-
-
-$('restartBtn').onclick=()=>{
-
-state.i=0;
-
-state.score=0;
-
-renderQuestion();
-
-};
-
-
-$('replayBtn').onclick=()=>{
-
-const q=questions[state.i];
-
-sequence(
-
-[
-`प्रश्न ${state.i+1}। ${q.question}`,
-`विकल्प A। ${q.options.A}`,
-`विकल्प B। ${q.options.B}`,
-`विकल्प C। ${q.options.C}`,
-`विकल्प D। ${q.options.D}`
-],
-
-()=>{},
-
-q.ttsLang||'hi-IN'
-
-);
-
-};
-
-
-$('muteBtn').onclick=()=>{
-
-state.muted=!state.muted;
-
-$('muteBtn').textContent=
-state.muted
-?'🔇'
-:'🔈';
-
-if(state.muted)
-stopAll();
-
-};
-
-
-$('replayRevealBtn').onclick=()=>{
-
-const q=questions[state.i];
-
-sequence(
-
-[
-`सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,
-`व्याख्या। ${q.explanation}`
-],
-
-()=>{},
-
-q.ttsLang||'hi-IN'
-
-);
-
-};
-
-
-$('nextBtn').onclick=()=>{
-
-nextQuestion();
-
-};
-
-
-$('startTotal').textContent=
-questions.length;
-
+$('editBtn').onclick=()=>{stopAll();renderEditor();show($('editorScreen'))};
+$('editorBack').onclick=()=>{readEditor();show($('startScreen'))};
+$('saveEditor').onclick=()=>{readEditor();$('startTotal').textContent=questions.length;show($('startScreen'))};
+$('resetEditor').onclick=()=>{questions=structuredClone(defaultQuestions);renderEditor()};
+$('startBtn').onclick=()=>{stopAll();state.i=0;state.score=0;renderQuestion()};
+$('quizBackBtn').onclick=()=>{stopAll();if(confirm('क्या आप Quiz से बाहर निकलना चाहती हैं? वर्तमान प्रश्न की progress समाप्त हो जाएगी।'))show($('startScreen'))};
+$('restartBtn').onclick=()=>{state.i=0;state.score=0;renderQuestion()};
+$('replayBtn').onclick=()=>{const q=questions[state.i];speakSequence([`प्रश्न ${state.i+1}। ${q.question}`,`विकल्प A। ${q.options.A}`,`विकल्प B। ${q.options.B}`,`विकल्प C। ${q.options.C}`,`विकल्प D। ${q.options.D}`],()=>{})};
+$('muteBtn').onclick=()=>{state.muted=!state.muted;$('muteBtn').textContent=state.muted?'🔇':'🔈';if(state.muted)stopAll()};
+$('replayRevealBtn').onclick=()=>{const q=questions[state.i];speakSequence([`सही उत्तर है। विकल्प ${q.answer}। ${q.options[q.answer]}`,`व्याख्या। ${q.explanation}`],()=>{})};
+$('nextBtn').onclick=()=>{if(!$('nextBtn').disabled)nextQuestion()};
+$('startTotal').textContent=questions.length;
+
+if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=loadVoices;loadVoices()}
 </script>
-
 </body>
 </html>
