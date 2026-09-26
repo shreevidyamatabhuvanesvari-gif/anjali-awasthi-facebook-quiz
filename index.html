@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#120b2b" />
+  <meta name="description" content="Anjali Awasthi Facebook Quiz - Single file quiz app with Hindi female-priority TTS." />
+  <title>Anjali Awasthi Facebook Quiz</title>
+  <style>
+    :root {
+      --bg-1: #120b2b;
+      --bg-2: #2f185c;
+      --bg-3: #6d2db8;
+      --card: rgba(255, 255, 255, 0.12);
+      --card-strong: rgba(255, 255, 255, 0.17);
+      --line: rgba(255, 255, 255, 0.16);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.72);
+      --accent: #ffcc70;
+      --accent-2: #ff7bd8;
+      --success: #43e6a8;
+      --danger: #ff6f8e;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --radius-xl: 34px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Devanagari", "Nirmala UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255, 123, 216, .22), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(92, 150, 255, .24), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(255, 204, 112, .16), transparent 34%),
+        linear-gradient(155deg, var(--bg-1), var(--bg-2) 52%, #1a0d39);
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid rgba(255, 204, 112, .75); outline-offset: 3px; }
+
+    .app-shell {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: calc(16px + var(--safe-top)) 14px calc(16px + var(--safe-bottom));
+    }
+
+    .quiz-frame {
+      width: min(100%, 430px);
+      aspect-ratio: 9 / 16;
+      max-height: calc(100dvh - 28px - var(--safe-top) - var(--safe-bottom));
+      min-height: min(640px, calc(100dvh - 28px - var(--safe-top) - var(--safe-bottom)));
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 38px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .ambient {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      filter: blur(28px);
+      opacity: .32;
+      pointer-events: none;
+    }
+    .ambient.a { background: #ff64cf; top: -70px; left: -80px; }
+    .ambient.b { background: #5e7cff; top: 18%; right: -120px; }
+    .ambient.c { background: #ffca70; bottom: -130px; left: 22%; }
+
+    .screen {
+      display: none;
+      position: absolute;
+      inset: 0;
+      padding: 22px;
+      flex-direction: column;
+      z-index: 2;
+    }
+    .screen.active { display: flex; animation: fadeIn .35s ease; }
+    @keyframes fadeIn { from { opacity: .2; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .brand-chip, .mini-chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      color: rgba(255,255,255,.84);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .brand-chip strong { color: var(--accent); }
+
+    .title-wrap {
+      margin: auto 0;
+      text-align: center;
+      padding: 10px 2px 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .title {
+      margin: 18px 0 8px;
+      font-size: clamp(31px, 9vw, 45px);
+      line-height: 1.05;
+      letter-spacing: -.8px;
+      font-weight: 900;
+      text-wrap: balance;
+    }
+    .title .shine {
+      background: linear-gradient(90deg, #fff, #ffce87, #ff89df, #fff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      background-size: 200% auto;
+      animation: shine 5s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+
+    .subtitle {
+      margin: 0 auto;
+      max-width: 340px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .start-card {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+      border: 1px solid var(--line);
+      text-align: left;
+    }
+    .start-card-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 11px;
+    }
+    .stat-label { font-size: 10px; color: var(--muted); font-weight: 700; }
+    .stat-value { font-size: 17px; font-weight: 900; margin-top: 2px; }
+
+    .primary-btn, .ghost-btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: transform .2s ease, filter .2s ease, background .2s ease;
+      font-weight: 900;
+    }
+    .primary-btn {
+      width: 100%;
+      color: #311542;
+      background: linear-gradient(135deg, var(--accent), #ff8ed6);
+      box-shadow: 0 12px 30px rgba(255, 139, 205, .2);
+    }
+    .primary-btn:hover, .ghost-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+    .primary-btn:active, .ghost-btn:active { transform: translateY(0); }
+
+    .ghost-btn {
+      color: var(--text);
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--line);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: rgba(255,255,255,.48);
+      font-size: 10px;
+      margin-top: 13px;
+    }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .question-count { font-size: 14px; font-weight: 900; }
+    .question-count span { color: var(--muted); font-weight: 700; }
+
+    .voice-tools { display: flex; gap: 8px; }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      color: white;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .progress {
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 16px;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #ffd27e, #ff78cf);
+      transition: width .35s ease;
+    }
+
+    .timer-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.15);
+      border: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 14px;
+    }
+    .timer-meta { display: flex; align-items: center; gap: 9px; }
+    .timer-dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      background: var(--success); box-shadow: 0 0 14px rgba(67,230,168,.6);
+    }
+    .timer-card.warning .timer-dot { background: var(--accent); box-shadow: 0 0 14px rgba(255,204,112,.6); }
+    .timer-card.danger .timer-dot { background: var(--danger); box-shadow: 0 0 14px rgba(255,111,142,.7); }
+    .timer-label { color: var(--muted); font-size: 11px; font-weight: 800; }
+    .timer-value { font-size: 26px; font-weight: 950; line-height: 1; min-width: 44px; text-align: right; }
+
+    .question-card {
+      padding: 19px 18px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.055));
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 13px;
+    }
+    .question-text {
+      width: 100%;
+      margin: 0;
+      font-size: clamp(20px, 6vw, 30px);
+      line-height: 1.35;
+      font-weight: 900;
+      letter-spacing: -.3px;
+    }
+
+    .tts-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 24px;
+      color: rgba(255,255,255,.67);
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .tts-status.speaking { color: var(--accent); }
+    .pulse {
+      width: 9px; height: 9px; border-radius: 50%; background: var(--accent);
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse { 50% { opacity: .35; transform: scale(.72); } }
+
+    .answers { display: grid; gap: 10px; flex: 1; min-height: 0; }
+    .option {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.07);
+      color: white;
+      border-radius: 18px;
+      padding: 13px 13px;
+      display: grid;
+      grid-template-columns: 37px 1fr;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease, opacity .2s ease;
+      min-height: 58px;
+    }
+    .option:hover:not(:disabled) { transform: translateY(-1px); background: rgba(255,255,255,.11); }
+    .option:disabled { cursor: default; }
+    .option-key {
+      width: 37px; height: 37px;
+      border-radius: 12px;
+      display: grid; place-items: center;
+      font-weight: 950;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.11);
+    }
+    .option-text { font-size: 14px; font-weight: 800; line-height: 1.35; }
+    .option.selected { border-color: rgba(255,204,112,.78); background: rgba(255,204,112,.11); }
+    .option.correct { border-color: rgba(67,230,168,.85); background: rgba(67,230,168,.14); }
+    .option.incorrect { border-color: rgba(255,111,142,.85); background: rgba(255,111,142,.12); }
+    .option.dim { opacity: .48; }
+
+    .helper-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .helper-text { color: rgba(255,255,255,.55); font-size: 10px; }
+    .voice-chip { color: rgba(255,255,255,.6); font-size: 10px; text-align: right; max-width: 70%; }
+
+    .reveal-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      padding: 8px 4px;
+    }
+    .reveal-icon {
+      width: 75px; height: 75px; border-radius: 24px;
+      margin: 0 auto 18px;
+      display: grid; place-items: center;
+      font-size: 34px;
+      background: rgba(67,230,168,.12);
+      border: 1px solid rgba(67,230,168,.45);
+      box-shadow: 0 14px 30px rgba(0,0,0,.17);
+    }
+    .reveal-card h2 { margin: 0; font-size: 28px; }
+    .reveal-card .answer-label { margin-top: 8px; color: var(--accent); font-weight: 950; font-size: 18px; }
+    .explanation {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 19px;
+      background: rgba(255,255,255,.075);
+      border: 1px solid var(--line);
+      color: rgba(255,255,255,.86);
+      line-height: 1.6;
+      font-size: 13px;
+      text-align: left;
+      max-height: 32%;
+      overflow: auto;
+    }
+    .next-countdown { margin-top: 14px; color: rgba(255,255,255,.58); font-size: 11px; }
+    .reveal-actions { margin-top: 12px; display: flex; gap: 8px; }
+    .reveal-actions .ghost-btn { flex: 1; }
+
+    .result-head { text-align: center; margin-top: auto; }
+    .result-badge {
+      width: 100px; height: 100px; border-radius: 30px;
+      margin: 0 auto 18px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(255,204,112,.15), rgba(255,123,216,.17));
+      border: 1px solid var(--line);
+      font-size: 36px;
+      box-shadow: 0 16px 34px rgba(0,0,0,.22);
+    }
+    .result-score { font-size: 50px; line-height: 1; font-weight: 950; margin: 0; }
+    .result-title { margin: 10px 0 4px; font-size: 26px; font-weight: 900; }
+    .result-subtitle { color: var(--muted); font-size: 13px; margin: 0; }
+    .result-grid {
+      margin: 20px 0 18px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    }
+    .result-stat {
+      padding: 13px 8px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    .result-stat b { display: block; font-size: 21px; }
+    .result-stat span { color: rgba(255,255,255,.56); font-size: 10px; }
+
+    .hidden { display: none !important; }
+
+    .voice-panel {
+      margin-top: auto;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.12);
+    }
+    .voice-panel-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .voice-panel label { font-size: 11px; font-weight: 800; color: var(--muted); }
+    select {
+      max-width: 67%;
+      color: white;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px 9px;
+      outline: none;
+      font-size: 11px;
+    }
+    select option { color: #16111f; }
+
+    @media (max-height: 760px) {
+      .quiz-frame { min-height: calc(100dvh - 16px); border-radius: 30px; }
+      .screen { padding: 16px; }
+      .question-card { padding: 16px; min-height: 102px; }
+      .option { min-height: 51px; padding: 10px 11px; }
+      .option-key { width: 33px; height: 33px; }
+      .result-grid { margin: 12px 0; }
+    }
+
+    @media (min-width: 700px) {
+      .quiz-frame { width: 430px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="quiz-frame" aria-label="Anjali Awasthi Facebook Quiz">
+      <div class="ambient a"></div>
+      <div class="ambient b"></div>
+      <div class="ambient c"></div>
+
+      <!-- START SCREEN -->
+      <section id="startScreen" class="screen active">
+        <div class="topbar">
+          <div class="brand-chip"><strong>QUIZ</strong> • 9:16</div>
+          <div class="mini-chip">🎙️ Hindi TTS</div>
+        </div>
+
+        <div class="title-wrap">
+          <div class="eyebrow">✨ Smart Quiz Experience</div>
+          <h1 class="title"><span class="shine">Anjali Awasthi<br />Facebook Quiz</span></h1>
+          <p class="subtitle">प्रश्न सुनिए, विकल्प सुनिए, समय रहते उत्तर चुनिए और फिर सही उत्तर की व्याख्या आवाज़ में सुनिए।</p>
+
+          <div class="start-card">
+            <div class="start-card-row">
+              <div>
+                <div class="stat-label">TOTAL QUESTIONS</div>
+                <div class="stat-value" id="startTotal">10</div>
+              </div>
+              <div style="text-align:right">
+                <div class="stat-label">ANSWER TIMER</div>
+                <div class="stat-value"><span id="startTimer">10</span>s</div>
+              </div>
+            </div>
+            <button id="startBtn" class="primary-btn">▶ Start Quiz</button>
+            <div class="footer-note">TTS पहले प्रश्न और A/B/C/D पढ़ेगा • उसके बाद timer शुरू होगा</div>
+          </div>
+        </div>
+
+        <div class="voice-panel">
+          <div class="voice-panel-row">
+            <label for="voiceSelect">महिला TTS voice</label>
+            <select id="voiceSelect" aria-label="TTS voice selection"></select>
+          </div>
+          <div class="footer-note" style="margin-bottom:0; text-align:left;">Browser में उपलब्ध आवाज़ों के अनुसार सूची बदल सकती है।</div>
+        </div>
+      </section>
+
+      <!-- QUESTION SCREEN -->
+      <section id="quizScreen" class="screen">
+        <div class="quiz-header">
+          <div class="question-count">Question <span id="currentQuestion">1</span> / <span id="totalQuestions">10</span></div>
+          <div class="voice-tools">
+            <button id="replayBtn" class="icon-btn" type="button" title="Replay current TTS">🔊</button>
+            <button id="muteBtn" class="icon-btn" type="button" title="Mute / unmute TTS">🔈</button>
+          </div>
+        </div>
+
+        <div class="progress"><div id="progressBar"></div></div>
+
+        <div id="timerCard" class="timer-card">
+          <div class="timer-meta">
+            <div class="timer-dot"></div>
+            <div>
+              <div class="timer-label" id="timerLabel">उत्तर चुनने का समय</div>
+            </div>
+          </div>
+          <div id="timerValue" class="timer-value">10</div>
+        </div>
+
+        <div class="question-card">
+          <h2 id="questionText" class="question-text">प्रश्न यहाँ आएगा…</h2>
+        </div>
+
+        <div id="ttsStatus" class="tts-status"><span class="pulse"></span><span id="ttsStatusText">आवाज़ तैयार हो रही है…</span></div>
+
+        <div id="answers" class="answers"></div>
+
+        <div class="helper-row">
+          <div id="helperText" class="helper-text">Timer शुरू होने से पहले TTS समाप्त होगा।</div>
+          <div id="voiceName" class="voice-chip">Voice: —</div>
+        </div>
+      </section>
+
+      <!-- REVEAL SCREEN -->
+      <section id="revealScreen" class="screen">
+        <div class="quiz-header">
+          <div class="question-count">Answer Reveal</div>
+          <div class="mini-chip">5 sec</div>
+        </div>
+
+        <div class="reveal-card">
+          <div class="reveal-icon">✓</div>
+          <h2>सही उत्तर</h2>
+          <div id="revealAnswer" class="answer-label">—</div>
+          <div id="revealExplanation" class="explanation">व्याख्या…</div>
+          <div id="nextCountdown" class="next-countdown">अगला प्रश्न 5 सेकंड में…</div>
+          <div class="reveal-actions">
+            <button id="replayRevealBtn" class="ghost-btn" type="button">🔊 फिर से सुनें</button>
+            <button id="nextBtn" class="ghost-btn" type="button">अगला →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULT SCREEN -->
+      <section id="resultScreen" class="screen">
+        <div class="topbar">
+          <div class="brand-chip"><strong>RESULT</strong></div>
+          <div class="mini-chip">🎉 Quiz Complete</div>
+        </div>
+
+        <div class="result-head">
+          <div class="result-badge">🏆</div>
+          <p id="resultScore" class="result-score">0/10</p>
+          <h2 class="result-title">Quiz पूरा हुआ!</h2>
+          <p id="resultSubtitle" class="result-subtitle">बहुत बढ़िया प्रयास।</p>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-stat"><b id="correctCount">0</b><span>सही</span></div>
+          <div class="result-stat"><b id="wrongCount">0</b><span>गलत</span></div>
+          <div class="result-stat"><b id="percentCount">0%</b><span>स्कोर</span></div>
+        </div>
+
+        <button id="restartBtn" class="primary-btn">↻ फिर से शुरू करें</button>
+        <div class="footer-note">Question Bank नीचे JavaScript में editable है।</div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    /* ============================================================
+       ANJALI AWASTHI FACEBOOK QUIZ
+       ------------------------------------------------------------
+       केवल इस file को edit करके प्रश्न/विकल्प/उत्तर/व्याख्या बदलें।
+       ANSWER_TIME_SECONDS = उत्तर चुनने का समय
+       REVEAL_TIME_SECONDS = सही उत्तर + व्याख्या screen का समय
+       ============================================================ */
+
+    const ANSWER_TIME_SECONDS = 10;
+    const REVEAL_TIME_SECONDS = 5;
+
+    // ===================== QUESTION BANK ========================
+    // answer में केवल A / B / C / D रखें।
+    const quizQuestions = [
+      {
+        question: "भारत की राजधानी क्या है?",
+        options: {
+          A: "मुंबई",
+          B: "नई दिल्ली",
+          C: "कोलकाता",
+          D: "चेन्नई"
+        },
+        answer: "B",
+        explanation: "भारत की राजधानी नई दिल्ली है। यह भारत सरकार, संसद और केंद्र सरकार के प्रमुख कार्यालयों का प्रशासनिक केंद्र है।"
+      },
+      {
+        question: "भारत का राष्ट्रीय पशु कौन सा है?",
+        options: {
+          A: "सिंह",
+          B: "हाथी",
+          C: "बाघ",
+          D: "मोर"
+        },
+        answer: "C",
+        explanation: "बाघ भारत का राष्ट्रीय पशु है। यह शक्ति, साहस और वन्य जैव विविधता का महत्वपूर्ण प्रतीक माना जाता है।"
+      },
+      {
+        question: "भारत का राष्ट्रीय फूल कौन सा है?",
+        options: {
+          A: "गुलाब",
+          B: "कमल",
+          C: "चमेली",
+          D: "गेंदा"
+        },
+        answer: "B",
+        explanation: "कमल भारत का राष्ट्रीय फूल है। यह भारतीय संस्कृति में पवित्रता और सुंदरता से जुड़ा एक महत्वपूर्ण प्रतीक है।"
+      },
+      {
+        question: "पृथ्वी का एकमात्र प्राकृतिक उपग्रह कौन सा है?",
+        options: {
+          A: "सूर्य",
+          B: "मंगल",
+          C: "चंद्रमा",
+          D: "शुक्र"
+        },
+        answer: "C",
+        explanation: "चंद्रमा पृथ्वी का एकमात्र प्राकृतिक उपग्रह है। वह पृथ्वी की परिक्रमा करता है और उसके गुरुत्वाकर्षण के कारण समुद्र में ज्वार-भाटा भी प्रभावित होता है।"
+      },
+      {
+        question: "भारत का राष्ट्रीय ध्वज किस आकार का है?",
+        options: {
+          A: "वर्गाकार",
+          B: "आयताकार",
+          C: "त्रिभुजाकार",
+          D: "वृत्ताकार"
+        },
+        answer: "B",
+        explanation: "भारत का राष्ट्रीय ध्वज आयताकार होता है। इसमें समान चौड़ाई की तीन क्षैतिज पट्टियाँ होती हैं और बीच में अशोक चक्र होता है।"
+      },
+      {
+        question: "जल का रासायनिक सूत्र क्या है?",
+        options: {
+          A: "CO₂",
+          B: "O₂",
+          C: "H₂O",
+          D: "NaCl"
+        },
+        answer: "C",
+        explanation: "जल का रासायनिक सूत्र H₂O है। इसका एक अणु दो हाइड्रोजन परमाणुओं और एक ऑक्सीजन परमाणु से मिलकर बना होता है।"
+      },
+      {
+        question: "सूर्य के सबसे निकट कौन सा ग्रह है?",
+        options: {
+          A: "शुक्र",
+          B: "पृथ्वी",
+          C: "बुध",
+          D: "मंगल"
+        },
+        answer: "C",
+        explanation: "बुध सूर्य के सबसे निकट स्थित ग्रह है। यह सौरमंडल का सबसे छोटा ग्रह भी है।"
+      },
+      {
+        question: "भारत में संविधान दिवस कब मनाया जाता है?",
+        options: {
+          A: "15 अगस्त",
+          B: "26 जनवरी",
+          C: "2 अक्टूबर",
+          D: "26 नवंबर"
+        },
+        answer: "D",
+        explanation: "भारत में संविधान दिवस 26 नवंबर को मनाया जाता है। 26 नवंबर 1949 को संविधान सभा ने भारत के संविधान को अंगीकृत किया था।"
+      },
+      {
+        question: "कंप्यूटर का मुख्य प्रसंस्करण भाग किस नाम से जाना जाता है?",
+        options: {
+          A: "CPU",
+          B: "USB",
+          C: "PDF",
+          D: "HTML"
+        },
+        answer: "A",
+        explanation: "CPU का अर्थ Central Processing Unit है। यह कंप्यूटर में निर्देशों को संसाधित करने और गणनाएँ करने का मुख्य भाग है।"
+      },
+      {
+        question: "भारत का राष्ट्रीय पक्षी कौन सा है?",
+        options: {
+          A: "तोता",
+          B: "मोर",
+          C: "कोयल",
+          D: "हंस"
+        },
+        answer: "B",
+        explanation: "मोर भारत का राष्ट्रीय पक्षी है। इसके रंगीन पंख और विशिष्ट नृत्य के कारण यह भारतीय प्राकृतिक और सांस्कृतिक पहचान का महत्वपूर्ण प्रतीक है।"
+      }
+    ];
+
+    // =============================================================
+    // APP STATE
+    // =============================================================
+    const state = {
+      currentIndex: 0,
+      score: 0,
+      answered: false,
+      selectedAnswer: null,
+      timer: null,
+      revealTimer: null,
+      remaining: ANSWER_TIME_SECONDS,
+      revealRemaining: REVEAL_TIME_SECONDS,
+      voiceMuted: false,
+      voices: [],
+      selectedVoiceName: "",
+      speechToken: 0,
+      introFinished: false
+    };
+
+    const els = {
+      startScreen: document.getElementById("startScreen"),
+      quizScreen: document.getElementById("quizScreen"),
+      revealScreen: document.getElementById("revealScreen"),
+      resultScreen: document.getElementById("resultScreen"),
+      startBtn: document.getElementById("startBtn"),
+      restartBtn: document.getElementById("restartBtn"),
+      startTotal: document.getElementById("startTotal"),
+      startTimer: document.getElementById("startTimer"),
+      currentQuestion: document.getElementById("currentQuestion"),
+      totalQuestions: document.getElementById("totalQuestions"),
+      progressBar: document.getElementById("progressBar"),
+      timerCard: document.getElementById("timerCard"),
+      timerLabel: document.getElementById("timerLabel"),
+      timerValue: document.getElementById("timerValue"),
+      questionText: document.getElementById("questionText"),
+      answers: document.getElementById("answers"),
+      ttsStatus: document.getElementById("ttsStatus"),
+      ttsStatusText: document.getElementById("ttsStatusText"),
+      helperText: document.getElementById("helperText"),
+      voiceName: document.getElementById("voiceName"),
+      voiceSelect: document.getElementById("voiceSelect"),
+      replayBtn: document.getElementById("replayBtn"),
+      muteBtn: document.getElementById("muteBtn"),
+      revealAnswer: document.getElementById("revealAnswer"),
+      revealExplanation: document.getElementById("revealExplanation"),
+      nextCountdown: document.getElementById("nextCountdown"),
+      replayRevealBtn: document.getElementById("replayRevealBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      resultScore: document.getElementById("resultScore"),
+      correctCount: document.getElementById("correctCount"),
+      wrongCount: document.getElementById("wrongCount"),
+      percentCount: document.getElementById("percentCount"),
+      resultSubtitle: document.getElementById("resultSubtitle")
+    };
+
+    // =============================================================
+    // SCREEN / UI HELPERS
+    // =============================================================
+    function showScreen(screenEl) {
+      [els.startScreen, els.quizScreen, els.revealScreen, els.resultScreen]
+        .forEach(screen => screen.classList.remove("active"));
+      screenEl.classList.add("active");
+    }
+
+    function updateStartMeta() {
+      els.startTotal.textContent = quizQuestions.length;
+      els.startTimer.textContent = ANSWER_TIME_SECONDS;
+      els.totalQuestions.textContent = quizQuestions.length;
+    }
+
+    function setTtsStatus(text, speaking = false) {
+      els.ttsStatus.classList.toggle("speaking", speaking);
+      els.ttsStatusText.textContent = text;
+    }
+
+    function updateTimerVisual() {
+      els.timerValue.textContent = state.remaining;
+      els.timerCard.classList.remove("warning", "danger");
+      if (state.remaining <= 3) {
+        els.timerCard.classList.add("danger");
+      } else if (state.remaining <= 5) {
+        els.timerCard.classList.add("warning");
+      }
+    }
+
+    function updateProgress() {
+      const pct = ((state.currentIndex) / quizQuestions.length) * 100;
+      els.progressBar.style.width = `${pct}%`;
+    }
+
+    // =============================================================
+    // VOICE HANDLING
+    // =============================================================
+    function speechSupported() {
+      return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+    }
+
+    function loadVoices() {
+      if (!speechSupported()) {
+        els.voiceSelect.innerHTML = '<option>इस ब्राउज़र में TTS उपलब्ध नहीं</option>';
+        els.voiceSelect.disabled = true;
+        return;
+      }
+
+      const available = window.speechSynthesis.getVoices() || [];
+      state.voices = available.filter(v => v.lang && v.lang.toLowerCase().startsWith("hi"));
+      const allEnglishIndia = available.filter(v => (v.lang || "").toLowerCase().startsWith("en-in"));
+      const candidates = state.voices.length ? state.voices : allEnglishIndia;
+
+      els.voiceSelect.innerHTML = "";
+      if (!candidates.length) {
+        els.voiceSelect.innerHTML = '<option value="">Browser default voice</option>';
+        state.selectedVoiceName = "";
+        els.voiceName.textContent = "Voice: Browser default";
+        return;
+      }
+
+      const preferred = candidates.find(v => isLikelyFemale(v)) || candidates[0];
+      candidates.forEach((voice) => {
+        const option = document.createElement("option");
+        option.value = voice.name;
+        option.textContent = `${voice.name} (${voice.lang})${isLikelyFemale(voice) ? " • महिला-जैसी" : ""}`;
+        els.voiceSelect.appendChild(option);
+      });
+
+      state.selectedVoiceName = preferred.name;
+      els.voiceSelect.value = preferred.name;
+      els.voiceName.textContent = `Voice: ${preferred.name}`;
+    }
+
+    function isLikelyFemale(voice) {
+      const name = `${voice.name} ${voice.voiceURI}`.toLowerCase();
+      const femaleKeywords = [
+        "female", "woman", "zira", "neerja", "kalpana", "raveena", "heera", "swara",
+        "aditi", "priya", "veena", "lekha", "google hindi", "hindi india female"
+      ];
+      return femaleKeywords.some(k => name.includes(k));
+    }
+
+    function getSelectedVoice() {
+      return state.voices.find(v => v.name === state.selectedVoiceName)
+        || (window.speechSynthesis.getVoices() || []).find(v => v.name === state.selectedVoiceName)
+        || null;
+    }
+
+    function cleanForSpeech(text) {
+      return String(text)
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function stopSpeaking() {
+      if (speechSupported()) window.speechSynthesis.cancel();
+      state.speechToken += 1;
+      setTtsStatus("आवाज़ रोकी गई", false);
+    }
+
+    function speak(text, onStart, onEnd, onError) {
+      if (state.voiceMuted || !speechSupported()) {
+        if (onStart) onStart();
+        if (onEnd) onEnd();
+        return;
+      }
+
+      const token = ++state.speechToken;
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(cleanForSpeech(text));
+      const voice = getSelectedVoice();
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
+      } else {
+        utterance.lang = "hi-IN";
+      }
+      utterance.rate = 0.92;
+      utterance.pitch = 1.05;
+      utterance.volume = 1;
+
+      utterance.onstart = () => {
+        if (token !== state.speechToken) return;
+        if (onStart) onStart();
+      };
+      utterance.onend = () => {
+        if (token !== state.speechToken) return;
+        if (onEnd) onEnd();
+      };
+      utterance.onerror = (event) => {
+        if (token !== state.speechToken) return;
+        if (onError) onError(event);
+        else if (onEnd) onEnd();
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function speakSequence(items, done) {
+      if (!items.length || state.voiceMuted || !speechSupported()) {
+        done?.();
+        return;
+      }
+
+      let index = 0;
+      const token = ++state.speechToken;
+      window.speechSynthesis.cancel();
+
+      const next = () => {
+        if (token !== state.speechToken) return;
+        if (index >= items.length) {
+          done?.();
+          return;
+        }
+        const item = cleanForSpeech(items[index++]);
+        setTtsStatus(`सुनाया जा रहा है: ${index} / ${items.length}`, true);
+
+        const utterance = new SpeechSynthesisUtterance(item);
+        const voice = getSelectedVoice();
+        if (voice) {
+          utterance.voice = voice;
+          utterance.lang = voice.lang;
+        } else {
+          utterance.lang = "hi-IN";
+        }
+        utterance.rate = 0.92;
+        utterance.pitch = 1.05;
+        utterance.volume = 1;
+        utterance.onstart = () => {
+          if (token !== state.speechToken) return;
+        };
+        utterance.onend = () => next();
+        utterance.onerror = () => next();
+        window.speechSynthesis.speak(utterance);
+      };
+      next();
+    }
+
+    // =============================================================
+    // QUIZ FLOW
+    // =============================================================
+    function beginQuiz() {
+      stopTimers();
+      stopSpeaking();
+      state.currentIndex = 0;
+      state.score = 0;
+      state.answered = false;
+      state.selectedAnswer = null;
+      showScreen(els.quizScreen);
+      renderQuestion(true);
+    }
+
+    function renderQuestion(playTts = true) {
+      stopTimers();
+      stopSpeaking();
+      const q = quizQuestions[state.currentIndex];
+      state.answered = false;
+      state.selectedAnswer = null;
+      state.remaining = ANSWER_TIME_SECONDS;
+      updateTimerVisual();
+      updateProgress();
+      els.currentQuestion.textContent = state.currentIndex + 1;
+      els.totalQuestions.textContent = quizQuestions.length;
+      els.timerLabel.textContent = "उत्तर चुनने का समय";
+      els.helperText.textContent = "पहले TTS पूरा होगा, फिर timer शुरू होगा।";
+      els.questionText.textContent = q.question;
+      els.voiceName.textContent = `Voice: ${state.selectedVoiceName || "Browser default"}`;
+      els.answers.innerHTML = "";
+
+      ["A", "B", "C", "D"].forEach(letter => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option";
+        btn.dataset.answer = letter;
+        btn.innerHTML = `
+          <span class="option-key">${letter}</span>
+          <span class="option-text">${escapeHtml(q.options[letter])}</span>
+        `;
+        btn.addEventListener("click", () => selectAnswer(letter));
+        els.answers.appendChild(btn);
+      });
+
+      if (playTts && !state.voiceMuted && speechSupported()) {
+        const items = [
+          `प्रश्न: ${q.question}`,
+          `विकल्प A: ${q.options.A}`,
+          `विकल्प B: ${q.options.B}`,
+          `विकल्प C: ${q.options.C}`,
+          `विकल्प D: ${q.options.D}`
+        ];
+        speakSequence(items, () => {
+          if (state.currentIndex >= quizQuestions.length) return;
+          if (!state.answered) {
+            setTtsStatus("TTS पूरा हुआ • अब timer चल रहा है", false);
+            startAnswerTimer();
+          }
+        });
+      } else {
+        setTtsStatus(state.voiceMuted ? "TTS बंद है • timer शुरू" : "TTS उपलब्ध नहीं • timer शुरू", false);
+        startAnswerTimer();
+      }
+    }
+
+    function startAnswerTimer() {
+      stopTimerOnly();
+      state.remaining = ANSWER_TIME_SECONDS;
+      updateTimerVisual();
+      state.timer = setInterval(() => {
+        state.remaining -= 1;
+        updateTimerVisual();
+        if (state.remaining <= 0) {
+          stopTimerOnly();
+          revealAnswer();
+        }
+      }, 1000);
+    }
+
+    function selectAnswer(letter) {
+      if (state.answered) return;
+      state.selectedAnswer = letter;
+
+      document.querySelectorAll(".option").forEach(btn => {
+        btn.classList.remove("selected");
+      });
+      const selected = document.querySelector(`.option[data-answer="${letter}"]`);
+      if (selected) selected.classList.add("selected");
+      els.helperText.textContent = `आपने ${letter} चुना है • timer जारी है`;
+    }
+
+    function revealAnswer() {
+      if (state.answered) return;
+      state.answered = true;
+      stopTimerOnly();
+      stopSpeaking();
+
+      const q = quizQuestions[state.currentIndex];
+      const correct = q.answer;
+      const selected = state.selectedAnswer;
+      const wasCorrect = selected === correct;
+      if (wasCorrect) state.score += 1;
+
+      document.querySelectorAll(".option").forEach(btn => {
+        const answer = btn.dataset.answer;
+        btn.disabled = true;
+        if (answer === correct) btn.classList.add("correct");
+        else if (answer === selected && selected !== correct) btn.classList.add("incorrect");
+        else btn.classList.add("dim");
+      });
+
+      // छोटी delay देकर reveal screen पर जाएँ ताकि transition साफ दिखे।
+      setTimeout(() => showReveal(wasCorrect), 180);
+    }
+
+    function showReveal(wasCorrect) {
+      const q = quizQuestions[state.currentIndex];
+      const answerText = `${q.answer}. ${q.options[q.answer]}`;
+      els.revealAnswer.textContent = answerText;
+      els.revealExplanation.textContent = q.explanation;
+      els.nextCountdown.textContent = `${REVEAL_TIME_SECONDS} सेकंड बाद अगला प्रश्न…`;
+      showScreen(els.revealScreen);
+
+      const speakReveal = () => {
+        if (!state.voiceMuted && speechSupported()) {
+          speak(
+            `सही उत्तर है: ${q.options[q.answer]}. व्याख्या: ${q.explanation}`,
+            () => setTtsStatus?.("", true),
+            () => setTtsStatus?.("", false)
+          );
+        }
+      };
+
+      speakReveal();
+      startRevealTimer();
+    }
+
+    function startRevealTimer() {
+      stopRevealTimerOnly();
+      state.revealRemaining = REVEAL_TIME_SECONDS;
+      els.nextCountdown.textContent = `${state.revealRemaining} सेकंड बाद अगला प्रश्न…`;
+      state.revealTimer = setInterval(() => {
+        state.revealRemaining -= 1;
+        els.nextCountdown.textContent = state.revealRemaining > 0
+          ? `${state.revealRemaining} सेकंड बाद अगला प्रश्न…`
+          : "अगला प्रश्न खुल रहा है…";
+
+        if (state.revealRemaining <= 0) {
+          stopRevealTimerOnly();
+          goNext();
+        }
+      }, 1000);
+    }
+
+    function goNext() {
+      stopTimers();
+      stopSpeaking();
+      if (state.currentIndex >= quizQuestions.length - 1) {
+        showResult();
+        return;
+      }
+      state.currentIndex += 1;
+      showScreen(els.quizScreen);
+      renderQuestion(true);
+    }
+
+    function showResult() {
+      const total = quizQuestions.length;
+      const correct = state.score;
+      const wrong = total - correct;
+      const percent = Math.round((correct / total) * 100);
+
+      els.resultScore.textContent = `${correct}/${total}`;
+      els.correctCount.textContent = correct;
+      els.wrongCount.textContent = wrong;
+      els.percentCount.textContent = `${percent}%`;
+
+      let msg = "अच्छा प्रयास!";
+      if (percent === 100) msg = "शानदार! सभी उत्तर सही हैं।";
+      else if (percent >= 80) msg = "बहुत बढ़िया प्रदर्शन!";
+      else if (percent >= 60) msg = "अच्छा प्रयास, थोड़ा और अभ्यास करें।";
+      else msg = "लगातार अभ्यास से स्कोर और बेहतर होगा।";
+      els.resultSubtitle.textContent = msg;
+      showScreen(els.resultScreen);
+    }
+
+    // =============================================================
+    // TIMER HELPERS
+    // =============================================================
+    function stopTimerOnly() {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+    }
+
+    function stopRevealTimerOnly() {
+      if (state.revealTimer) {
+        clearInterval(state.revealTimer);
+        state.revealTimer = null;
+      }
+    }
+
+    function stopTimers() {
+      stopTimerOnly();
+      stopRevealTimerOnly();
+    }
+
+    // =============================================================
+    // EVENTS
+    // =============================================================
+    els.startBtn.addEventListener("click", beginQuiz);
+    els.restartBtn.addEventListener("click", beginQuiz);
+
+    els.replayBtn.addEventListener("click", () => {
+      const q = quizQuestions[state.currentIndex];
+      stopSpeaking();
+      const items = [
+        `प्रश्न: ${q.question}`,
+        `विकल्प A: ${q.options.A}`,
+        `विकल्प B: ${q.options.B}`,
+        `विकल्प C: ${q.options.C}`,
+        `विकल्प D: ${q.options.D}`
+      ];
+      if (state.answered) {
+        speak(`प्रश्न: ${q.question}. सही उत्तर: ${q.options[q.answer]}. व्याख्या: ${q.explanation}`);
+      } else {
+        speakSequence(items, () => {
+          if (!state.answered && state.remaining > 0) setTtsStatus("TTS दोबारा पूरा हुआ", false);
+        });
+      }
+    });
+
+    els.muteBtn.addEventListener("click", () => {
+      state.voiceMuted = !state.voiceMuted;
+      if (state.voiceMuted) {
+        stopSpeaking();
+        els.muteBtn.textContent = "🔇";
+        els.muteBtn.title = "Unmute TTS";
+        setTtsStatus("TTS बंद है", false);
+      } else {
+        els.muteBtn.textContent = "🔈";
+        els.muteBtn.title = "Mute TTS";
+        setTtsStatus("TTS फिर से चालू है", false);
+      }
+    });
+
+    els.voiceSelect.addEventListener("change", () => {
+      state.selectedVoiceName = els.voiceSelect.value;
+      els.voiceName.textContent = `Voice: ${state.selectedVoiceName || "Browser default"}`;
+    });
+
+    els.replayRevealBtn.addEventListener("click", () => {
+      const q = quizQuestions[state.currentIndex];
+      stopSpeaking();
+      if (!state.voiceMuted && speechSupported()) {
+        speak(`सही उत्तर है: ${q.options[q.answer]}. व्याख्या: ${q.explanation}`);
+      }
+    });
+
+    els.nextBtn.addEventListener("click", () => {
+      stopRevealTimerOnly();
+      goNext();
+    });
+
+    // Keyboard support for desktop: A/B/C/D
+    document.addEventListener("keydown", (event) => {
+      if (!els.quizScreen.classList.contains("active") || state.answered) return;
+      const key = event.key.toUpperCase();
+      if (["A", "B", "C", "D"].includes(key)) selectAnswer(key);
+    });
+
+    // Prevent accidental speech overlap on page unload.
+    window.addEventListener("beforeunload", () => {
+      stopTimers();
+      stopSpeaking();
+    });
+
+    // Voices are populated asynchronously on most browsers.
+    if (speechSupported()) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    updateStartMeta();
+
+    // Simple HTML escaping for option strings.
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
